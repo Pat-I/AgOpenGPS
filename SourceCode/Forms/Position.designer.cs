@@ -19,6 +19,7 @@ namespace AgOpenGPS
 
         //how many fix updates per sec
         public int fixUpdateHz = 5;
+        public int SurveySkip = 0;
         public double fixUpdateTime = 0.2;
 
         //for heading or Atan2 as camera
@@ -46,7 +47,10 @@ namespace AgOpenGPS
 
         //how far travelled since last section was added, section points
         double sectionTriggerDistance = 0, sectionTriggerStepDistance = 0;
+        double surveyTriggerDistance = 0, surveyTriggerStepDistance = 0;
+
         public vec2 prevSectionPos = new vec2(0, 0);
+        public vec2 prevSurveyPos = new vec2(-100000, -100000);
 
         public vec2 prevBoundaryPos = new vec2(0, 0);
 
@@ -723,6 +727,7 @@ namespace AgOpenGPS
 
             //To prevent drawing high numbers of triangles, determine and test before drawing vertex
             sectionTriggerDistance = glm.Distance(pn.fix, prevSectionPos);
+            surveyTriggerDistance = glm.Distance(pn.fix, prevSurveyPos);
 
             //section on off and points, contour points
             if (sectionTriggerDistance > sectionTriggerStepDistance && isJobStarted)
@@ -734,6 +739,34 @@ namespace AgOpenGPS
                                                     + pn.altitude.ToString("N2") + ","
                                                     + pn.latitude + "," + pn.longitude + "\r\n");
             }
+
+            if (surveyTriggerDistance > surveyTriggerStepDistance && isJobStarted &&!bnd.isBndBeingMade && SPt.isSurveyOn)
+            {
+                double lat = pn.latitude;
+                double lon = pn.longitude;
+                double elev1 = pn.altitude;
+                double elev2 = -1;
+                pn.DecDeg2UTM(lat, lon);
+                double est = pivotAxlePos.easting;
+                double nrt = pivotAxlePos.northing;
+
+                CSurveyPt point1 = new CSurveyPt(
+                     est,
+                                    0.0,
+                                    nrt,
+                                    elev1,
+                                    lat,
+                                    lon,
+                                    elev2,
+                                    -1,
+                                    -1);
+                SPt.ptList.Add(point1);
+                
+                prevSurveyPos.easting = est;
+                prevSurveyPos.northing = nrt;
+
+            }
+            
 
             //test if travelled far enough for new boundary point
             if (bnd.isOkToAddPoints)
@@ -882,6 +915,7 @@ namespace AgOpenGPS
             //finally fixed distance for making a curve line
             if (!curve.isOkToAddPoints) sectionTriggerStepDistance = sectionTriggerStepDistance + 0.2;
             else sectionTriggerStepDistance = 1.0;
+            surveyTriggerStepDistance = tool.toolWidth;
 
             //precalc the sin and cos of heading * -1
             sinSectionHeading = Math.Sin(-toolPos.heading);
@@ -904,9 +938,10 @@ namespace AgOpenGPS
                     //Right side
                     vec3 point = new vec3(
                         pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - glm.PIBy2) * -bnd.createBndOffset),
-                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * -bnd.createBndOffset), 
+                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * -bnd.createBndOffset),
                         pivotAxlePos.heading);
                     bnd.bndBeingMadePts.Add(point);
+
                 }
 
                 //draw on left side
@@ -915,9 +950,37 @@ namespace AgOpenGPS
                     //Right side
                     vec3 point = new vec3(
                         pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - glm.PIBy2) * bnd.createBndOffset),
-                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * bnd.createBndOffset), 
+                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * bnd.createBndOffset),
                         pivotAxlePos.heading);
                     bnd.bndBeingMadePts.Add(point);
+
+
+                }
+                if (surveyTriggerDistance > surveyTriggerStepDistance && isJobStarted && SPt.isSurveyOn)
+                {
+                    double lat = pn.latitude;
+                    double lon = pn.longitude;
+                    double elev1 = pn.altitude;
+                    double elev2 = -1;
+                    pn.DecDeg2UTM(lat, lon);
+                    double est = pivotAxlePos.easting;
+                    double nrt = pivotAxlePos.northing;
+
+                    CSurveyPt point1 = new CSurveyPt(
+                         est,
+                                        0.0,
+                                        nrt,
+                                        elev1,
+                                        lat,
+                                        lon,
+                                        elev2,
+                                        -1,
+                                        -1);
+                    SPt.ptList.Add(point1);
+                    SPt.ptList[SPt.ptList.Count - 1].comment = "2PER";
+
+                    prevSurveyPos.easting = est;
+                    prevSurveyPos.northing = nrt;
                 }
             }
         }

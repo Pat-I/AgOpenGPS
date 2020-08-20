@@ -110,6 +110,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CSurvey.cs" />
     <Compile Include="Classes\CSunTimes.cs" />
     <Compile Include="Classes\CFieldData.cs" />
     <Compile Include="Classes\CBoundaryLines.cs" />
@@ -838,6 +839,8 @@
     <Content Include="AppIcon.ico" />
     <Content Include="AppIcon64.ico" />
     <Content Include="aChangeLog.txt" />
+    <Content Include="Resources\survey2.png" />
+    <None Include="Resources\survey21.png" />
     <None Include="Resources\Alarm10.wav" />
     <None Include="btnImages\ABLineCycle.png" />
     <None Include="btnImages\displayMenu.png" />
@@ -906,6 +909,7 @@
     <None Include="btnImages\Sort.png" />
     <None Include="btnImages\FileSaveAs.png" />
     <None Include="btnImages\ColorBackGnd.png" />
+    <Content Include="btnImages\survey2.png" />
     <Content Include="Dependencies\Audio\Boundary.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -2154,6 +2154,99 @@ namespace AgOpenGPS
             }
         }
 
+        public void FileSaveSurvey()
+        {
+            
+
+            //get the directory and make sure it exists, create if not
+            string dirField = fieldsDirectory + currentFieldDirectory + "\\";
+
+            string directoryName = Path.GetDirectoryName(dirField);
+            if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
+            { Directory.CreateDirectory(directoryName); }
+
+            string myFileName = "Survey.txt";
+
+            //write out the file
+            using (StreamWriter writer = new StreamWriter(dirField + myFileName))
+            {
+                //Write out the date
+                writer.WriteLine(DateTime.Now.ToString("yyyy-MMMM-dd hh:mm:ss tt", CultureInfo.InvariantCulture));
+                writer.WriteLine("Points in Patch followed by easting, heading, northing, altitude");
+
+                //which field directory
+                writer.WriteLine("$ContourDir");
+                writer.WriteLine(currentFieldDirectory);
+
+                //write out the easting and northing Offsets
+                writer.WriteLine("$Offsets");
+                writer.WriteLine(pn.utmEast.ToString(CultureInfo.InvariantCulture) +
+                    "," + pn.utmNorth.ToString(CultureInfo.InvariantCulture) + "," + pn.zone.ToString(CultureInfo.InvariantCulture));
+
+
+                //make sure there is something to save
+                if (SPt.ptList.Count() > 0)
+                {
+                    int count2 = SPt.ptList.Count;
+
+                    //for every new chunk of patch in the whole section
+
+                    writer.WriteLine(count2.ToString(CultureInfo.InvariantCulture));
+
+                    for (int i = 0; i < count2; i++)
+                    {
+                        writer.WriteLine(Math.Round((SPt.ptList[i].easting), 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].heading, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].latitude, 7).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].longitude, 7).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].cutAltitude, 7).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].lastPassAltitude, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(SPt.ptList[i].distance, 3).ToString(CultureInfo.InvariantCulture));
+                    }
+                }
+            }
+            //set saving flag off
+            isSavingFile = false;
+        }
+
+        public void FileSaveSurvey_ags()
+        {
+            //get the directory and make sure it exists, create if not
+            string dirField = fieldsDirectory + currentFieldDirectory + "\\";
+
+            string directoryName = Path.GetDirectoryName(dirField);
+            if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
+            { Directory.CreateDirectory(directoryName); }
+
+            string myFileName = "Survey.ags";
+
+            //write out the file
+            using (StreamWriter writer = new StreamWriter(dirField + myFileName))
+            {
+                                
+                writer.WriteLine("Latitude, Longitude, Elevation, Comment");
+
+                //make sure there is something to save
+                if (SPt.ptList.Count() > 0)
+                {
+                    int count2 = SPt.ptList.Count;
+
+                    
+                    for (int i = 0; i < count2; i++)
+                    {
+                        writer.WriteLine(Math.Round(SPt.ptList[i].latitude, 7).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(SPt.ptList[i].longitude, 7).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(SPt.ptList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", " +
+                            SPt.ptList[i].comment);
+                    }
+                }
+            }
+            //set saving flag off
+            isSavingFile = false;
+        }
+
         //save the boundary
         public void FileSaveBoundary()
         {

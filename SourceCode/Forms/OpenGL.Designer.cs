@@ -372,6 +372,7 @@ namespace AgOpenGPS
                     //if (recPath.isRecordOn)
                     recPath.DrawRecordedLine();
                     recPath.DrawDubins();
+                    SPt.DrawSurveyLine();
 
                     //draw Boundaries
                     bnd.DrawBoundaryLines();
@@ -1267,6 +1268,9 @@ namespace AgOpenGPS
                     //auto save the field patches, contours accumulated so far
                     FileSaveSections();
                     FileSaveContour();
+                    FileSaveSurvey();
+                    FileSaveElevation();
+                    FileSaveSurvey_ags();
 
                     //NMEA log file
                     if (isLogElevation) FileSaveElevation();

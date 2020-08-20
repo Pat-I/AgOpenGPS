@@ -219,6 +219,8 @@
             this.contextManualColor = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.SurveyBtn = new System.Windows.Forms.Button();
             this.btnDayNightMode = new System.Windows.Forms.Button();
             this.btnShutdown = new System.Windows.Forms.Button();
             this.btnFullScreen = new System.Windows.Forms.Button();
@@ -235,6 +237,7 @@
             this.statusStripLeft.SuspendLayout();
             this.panelSim.SuspendLayout();
             this.contextManualColor.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // contextMenuStripOpenGL
@@ -809,7 +812,7 @@
             this.toolStripMenuFlagForm.Image = global::AgOpenGPS.Properties.Resources.OK64;
             this.toolStripMenuFlagForm.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.toolStripMenuFlagForm.Name = "toolStripMenuFlagForm";
-            this.toolStripMenuFlagForm.Size = new System.Drawing.Size(244, 70);
+            this.toolStripMenuFlagForm.Size = new System.Drawing.Size(228, 70);
             this.toolStripMenuFlagForm.Text = "toolStripMenuItem3";
             this.toolStripMenuFlagForm.Click += new System.EventHandler(this.toolStripMenuFlagForm_Click);
             // 
@@ -1016,7 +1019,7 @@
             this.btnResetSim.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResetSim.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnResetSim.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnResetSim.Location = new System.Drawing.Point(585, 4);
+            this.btnResetSim.Location = new System.Drawing.Point(573, 4);
             this.btnResetSim.Name = "btnResetSim";
             this.btnResetSim.Size = new System.Drawing.Size(52, 31);
             this.btnResetSim.TabIndex = 164;
@@ -1032,7 +1035,7 @@
             this.btnResetSteerAngle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResetSteerAngle.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnResetSteerAngle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnResetSteerAngle.Location = new System.Drawing.Point(520, 4);
+            this.btnResetSteerAngle.Location = new System.Drawing.Point(508, 4);
             this.btnResetSteerAngle.Name = "btnResetSteerAngle";
             this.btnResetSteerAngle.Size = new System.Drawing.Size(58, 31);
             this.btnResetSteerAngle.TabIndex = 162;
@@ -1057,10 +1060,10 @@
             this.hsbarSteerAngle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hsbarSteerAngle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.hsbarSteerAngle.LargeChange = 20;
-            this.hsbarSteerAngle.Location = new System.Drawing.Point(332, 1);
+            this.hsbarSteerAngle.Location = new System.Drawing.Point(326, 1);
             this.hsbarSteerAngle.Maximum = 800;
             this.hsbarSteerAngle.Name = "hsbarSteerAngle";
-            this.hsbarSteerAngle.Size = new System.Drawing.Size(168, 37);
+            this.hsbarSteerAngle.Size = new System.Drawing.Size(162, 37);
             this.hsbarSteerAngle.TabIndex = 179;
             this.hsbarSteerAngle.Value = 400;
             this.hsbarSteerAngle.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hsbarSteerAngle_Scroll);
@@ -1073,7 +1076,7 @@
             this.hsbarStepDistance.Location = new System.Drawing.Point(82, 1);
             this.hsbarStepDistance.Minimum = -6;
             this.hsbarStepDistance.Name = "hsbarStepDistance";
-            this.hsbarStepDistance.Size = new System.Drawing.Size(168, 37);
+            this.hsbarStepDistance.Size = new System.Drawing.Size(162, 37);
             this.hsbarStepDistance.TabIndex = 178;
             this.hsbarStepDistance.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hsbarStepDistance_Scroll);
             // 
@@ -1473,14 +1476,14 @@
             this.contextMenuABLine.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.editABToolStripMenuItem});
             this.contextMenuABLine.Name = "contextMenuABLine";
-            this.contextMenuABLine.Size = new System.Drawing.Size(116, 26);
+            this.contextMenuABLine.Size = new System.Drawing.Size(110, 26);
             // 
             // editABToolStripMenuItem
             // 
             this.editABToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.editABToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.editABToolStripMenuItem.Name = "editABToolStripMenuItem";
-            this.editABToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.editABToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.editABToolStripMenuItem.Text = "EditAB";
             // 
             // btnAutoSteer
@@ -2401,7 +2404,7 @@
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 128F));
+            this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.panelSim.Controls.Add(this.btnReverseDirection, 0, 0);
             this.panelSim.Controls.Add(this.btnResetSteerAngle, 4, 0);
             this.panelSim.Controls.Add(this.hsbarSteerAngle, 3, 0);
@@ -2441,7 +2444,7 @@
             this.btnSimSetSpeedToZero.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSimSetSpeedToZero.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnSimSetSpeedToZero.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSimSetSpeedToZero.Location = new System.Drawing.Point(259, 4);
+            this.btnSimSetSpeedToZero.Location = new System.Drawing.Point(253, 4);
             this.btnSimSetSpeedToZero.Name = "btnSimSetSpeedToZero";
             this.btnSimSetSpeedToZero.Size = new System.Drawing.Size(63, 31);
             this.btnSimSetSpeedToZero.TabIndex = 453;
@@ -2544,6 +2547,48 @@
             this.toolStripMenuItem5.Size = new System.Drawing.Size(70, 70);
             this.toolStripMenuItem5.Text = ".";
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(12, 601);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(54, 27);
+            this.numericUpDown1.TabIndex = 453;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            108,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Visible = false;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // SurveyBtn
+            // 
+            this.SurveyBtn.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.SurveyBtn.BackColor = System.Drawing.Color.Transparent;
+            this.SurveyBtn.BackgroundImage = global::AgOpenGPS.Properties.Resources.survey2;
+            this.SurveyBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.SurveyBtn.FlatAppearance.BorderColor = System.Drawing.Color.RoyalBlue;
+            this.SurveyBtn.FlatAppearance.BorderSize = 0;
+            this.SurveyBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SurveyBtn.Font = new System.Drawing.Font("Tahoma", 12F);
+            this.SurveyBtn.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.SurveyBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.SurveyBtn.Location = new System.Drawing.Point(0, 529);
+            this.SurveyBtn.Name = "SurveyBtn";
+            this.SurveyBtn.Size = new System.Drawing.Size(66, 66);
+            this.SurveyBtn.TabIndex = 454;
+            this.SurveyBtn.Text = "Is Off";
+            this.SurveyBtn.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.SurveyBtn.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.SurveyBtn.UseCompatibleTextRendering = true;
+            this.SurveyBtn.UseVisualStyleBackColor = false;
+            this.SurveyBtn.Click += new System.EventHandler(this.SurveyBtn_Click);
+            // 
             // btnDayNightMode
             // 
             this.btnDayNightMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -2634,6 +2679,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(1302, 691);
+            this.Controls.Add(this.SurveyBtn);
+            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.btnDayNightMode);
             this.Controls.Add(this.btnSection13Man);
             this.Controls.Add(this.btnSection14Man);
@@ -2691,6 +2738,7 @@
             this.statusStripLeft.PerformLayout();
             this.panelSim.ResumeLayout(false);
             this.contextManualColor.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2891,6 +2939,8 @@
         public System.Windows.Forms.ToolStripMenuItem steerChartStripMenu;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         public System.Windows.Forms.Button btnDayNightMode;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        public System.Windows.Forms.Button SurveyBtn;
     }
 }
 

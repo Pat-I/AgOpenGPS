@@ -61,7 +61,7 @@ namespace AgOpenGPS
         public bool isJobStarted = false, isAutoSteerBtnOn, isLidarBtnOn = true;
 
         //if we are saving a file
-        public bool isSavingFile = false, isLogNMEA = false, isLogElevation = false;
+        public bool isSavingFile = false, isLogNMEA = false, isLogElevation = true;
 
         //texture holders
         public uint[] texture = new uint[15];
@@ -197,6 +197,8 @@ namespace AgOpenGPS
         /// The headland created
         /// </summary>
         public CHead hd;
+
+        public CSurvey SPt;
 
         /// <summary>
         /// The entry and exit sequences, functions, actions
@@ -379,6 +381,10 @@ namespace AgOpenGPS
 
             //headland object
             hd = new CHead( this);
+
+            SPt = new CSurvey(this);
+
+
 
             //headland entry/exit sequences
             seq = new CSequence(this);
@@ -1174,6 +1180,18 @@ namespace AgOpenGPS
             Settings.Default.Save();
 
             stripSectionColor.BackColor = sectionColorDay;
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            sim.altitude = Convert.ToDouble(numericUpDown1.Value);
+        }
+
+        private void SurveyBtn_Click(object sender, EventArgs e)
+        {
+            SPt.isSurveyOn = !SPt.isSurveyOn;
+            if (SPt.isSurveyOn) SurveyBtn.Text = "Is On";
+            else SurveyBtn.Text = "Is Off";
         }
 
         private void keyboardToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -1987,6 +2005,9 @@ namespace AgOpenGPS
             FileSaveBoundary();
             FileSaveSections();
             FileSaveContour();
+            FileSaveSurvey();
+            FileSaveElevation();
+            FileSaveSurvey_ags();
             FileSaveFieldKML();
 
             JobClose();
