@@ -304,6 +304,7 @@ namespace AgOpenGPS
                                     if ((ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR) && !ahrs.isRollFromOGI)
                                     {
                                         rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
+                                        ct.rollUsedForAGS = rollUsed;
 
                                         //change for roll to the right is positive times -1
                                         rollCorrectionDistance = Math.Sin(glm.toRadians((rollUsed))) * -vehicle.antennaHeight;

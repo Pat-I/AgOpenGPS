@@ -4,6 +4,34 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
+    //Survey list by Pat
+    public class SurveyPt
+    {
+        public double easting { get; set; }
+        public double northing { get; set; }
+        public double latitude { get; set; }
+        public double longitude { get; set; }
+        public double altitude { get; set; }
+        public double code { get; set; }
+        public int fixQuality { get; set; }
+
+
+        //constructor
+        public SurveyPt(double _easting, double _northing, double _lat, double _long, double _altitude = -1, double _code = -1, int _fixQuality = 0)
+        {
+
+            easting = _easting;
+            northing = _northing;
+            latitude = _lat;
+            longitude = _long;
+            altitude = _altitude;
+
+            code = _code;
+            fixQuality = _fixQuality;
+
+        }
+    }
+
     public class CContour
     {
         //copy of the mainform address
@@ -13,6 +41,13 @@ namespace AgOpenGPS
 
         //used to determine if section was off and now is on or vice versa
         public bool wasSectionOn;
+
+        //the ags file stuff
+        public bool isSurveyOn, isOKtoSurvey, markBM, clearSurveyList, recBoundary, isBtnStartPause, isBoundarySideRight, recSurveyPt, FloatIsOK, readyForBM;
+        public double nearestSurveyEasting, nearestSurveyNorthing;
+        public double rollUsedForAGS;
+
+        public List<SurveyPt> surveyList = new List<SurveyPt>();
 
         //generated box for finding closest point
         public vec2 boxA = new vec2(0, 0), boxB = new vec2(0, 2);
@@ -1124,6 +1159,165 @@ namespace AgOpenGPS
             stripList.Clear();
             ptList?.Clear();
             ctList?.Clear();
+        }
+
+        public void CreateAGSlist()
+        {
+            if (isSurveyOn)
+            {
+                if (clearSurveyList)
+                {
+                    surveyList.Clear();
+                    clearSurveyList = false;
+                    readyForBM = true;
+                }
+
+                // Check the fix Quality before saving the point
+
+
+                if (mf.pn.fixQuality == 4 | mf.pn.fixQuality == 8) isOKtoSurvey = true;
+                else if (mf.pn.fixQuality == 5 && FloatIsOK) isOKtoSurvey = true;
+                else isOKtoSurvey = false;
+
+                if (isOKtoSurvey)
+                {
+
+                    if (markBM)
+                    {
+                        double surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight);
+
+                        double actualEasting = mf.pivotAxlePos.easting + mf.pn.utmEast;
+                        double actualNorthing = mf.pivotAxlePos.northing + mf.pn.utmNorth;
+
+                        mf.UTMToLatLon(actualEasting, actualNorthing);
+           
+                        SurveyPt point = new SurveyPt(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, mf.utmLat, mf.utmLon, surveyAlt, 0, mf.pn.fixQuality);
+                        surveyList.Add(point);
+
+                        nearestSurveyEasting = mf.pivotAxlePos.easting;
+                        nearestSurveyNorthing = mf.pivotAxlePos.northing;
+
+                        markBM = false;
+                        recBoundary = true;
+                        readyForBM = false;
+
+                    }
+
+                    // Start recording contour
+
+                    if (recBoundary)
+                    {
+                        double halfToolWidth = (Properties.Vehicle.Default.setVehicle_toolWidth) / 2;
+
+                        if (isBtnStartPause)
+                        {
+                            // translate the survey pt to the side of the tool
+
+                            double sideEasting;
+                            double sideNorthing;
+                            double surveyAlt;
+
+                            if (isBoundarySideRight)
+                            {
+                                sideEasting = mf.pivotAxlePos.easting + Math.Sin(mf.pivotAxlePos.heading - glm.PIBy2) * -halfToolWidth;
+                                sideNorthing = mf.pivotAxlePos.northing + Math.Cos(mf.pivotAxlePos.heading - glm.PIBy2) * -halfToolWidth;                               
+                            }
+                            else
+                            {
+                                sideEasting = mf.pivotAxlePos.easting + Math.Sin(mf.pivotAxlePos.heading - glm.PIBy2) * halfToolWidth;
+                                sideNorthing = mf.pivotAxlePos.northing + Math.Cos(mf.pivotAxlePos.heading - glm.PIBy2) * halfToolWidth;                              
+                            }
+
+                            //check dist from last point 
+
+                            double surveyDistance = ((nearestSurveyEasting - sideEasting) * (nearestSurveyEasting - sideEasting) +
+                            (nearestSurveyNorthing - sideNorthing) * (nearestSurveyNorthing - sideNorthing));
+
+                            if (surveyDistance > 9)
+                            {
+                                // convert the utm from the side of the blade to lat long
+                                double actualEasting = sideEasting + mf.pn.utmEast;
+                                double actualNorthing = sideNorthing + mf.pn.utmNorth;
+
+                                mf.UTMToLatLon(actualEasting, actualNorthing);
+
+                                if (isBoundarySideRight) surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight) -
+                                    Math.Sin(glm.toRadians((rollUsedForAGS))) * halfToolWidth;
+                                else surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight) +
+                                   Math.Sin(glm.toRadians((rollUsedForAGS))) * halfToolWidth;
+
+                                SurveyPt point = new SurveyPt(sideEasting, sideNorthing, mf.utmLat, mf.utmLon, surveyAlt, 2, mf.pn.fixQuality);
+                                surveyList.Add(point);
+
+                                nearestSurveyEasting = mf.pivotAxlePos.easting;
+                                nearestSurveyNorthing = mf.pivotAxlePos.northing;
+
+                            }
+
+                        }
+
+                    }
+
+                    if (recSurveyPt)
+                    {
+                        if (isBtnStartPause)
+                        {
+                            // check for the nearest point in the surveyList
+
+                            int surveyCount = surveyList.Count;
+                            double minSurveyDistance = 1000000;
+
+                            for (int i = 0; i < surveyCount; i++)
+                            {
+                                double surveyDistance = ((surveyList[i].easting - mf.pivotAxlePos.easting) * (surveyList[i].easting - mf.pivotAxlePos.easting) +
+                                    (surveyList[i].northing - mf.pivotAxlePos.northing) * (surveyList[i].northing - mf.pivotAxlePos.northing));
+
+                                if (surveyDistance < minSurveyDistance) minSurveyDistance = surveyDistance;
+                            }
+
+                            // if there is no point 3 metre around add a point
+                            if (minSurveyDistance > 9)
+                            {
+                                double surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight);
+
+                                double actualEasting = mf.pivotAxlePos.easting + mf.pn.utmEast;
+                                double actualNorthing = mf.pivotAxlePos.northing + mf.pn.utmNorth;
+
+                                mf.UTMToLatLon(actualEasting, actualNorthing);
+
+                                SurveyPt point = new SurveyPt(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, mf.utmLat, mf.utmLon, surveyAlt, 3, mf.pn.fixQuality);
+                                surveyList.Add(point);
+
+                                nearestSurveyEasting = mf.pivotAxlePos.easting;
+                                nearestSurveyNorthing = mf.pivotAxlePos.northing;
+
+                            }
+
+                        }
+
+
+                    }
+                }
+
+            }
+            else
+            {
+                // finish the survey
+                if (recSurveyPt)
+                {
+                    mf.FileSaveSurveyPt();
+
+                    recSurveyPt = false;
+                    mf.isSurveyStandby = false;
+                    mf.btnAGSmode.Visible = false;
+                    mf.btnAGSboundary.Visible = false;
+                    mf.btnAGSquality.Visible = false;
+                    mf.btnAGSstart.Visible = false;
+                    mf.btnAGS.Text = "Create AGS file";
+                }
+
+                
+            }
         }
     }//class
 }//namespace

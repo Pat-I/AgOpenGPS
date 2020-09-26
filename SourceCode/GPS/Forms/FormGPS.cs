@@ -1176,6 +1176,108 @@ namespace AgOpenGPS
             stripSectionColor.BackColor = sectionColorDay;
         }
 
+        private void btnAGS_Click(object sender, EventArgs e)
+        {
+            if (!isSurveyStandby)
+            {
+                isSurveyStandby = true;
+                ct.clearSurveyList = true;
+                ct.isSurveyOn = true;
+
+                btnAGSmode.Visible = true;
+                btnAGSboundary.Visible = true;
+                btnAGSquality.Visible = true;
+                btnAGSstart.Visible = true;
+                btnAGS.Text = "Click to cancel";
+            }
+            else
+            // cancel all
+            {
+                isSurveyStandby = false;
+                ct.clearSurveyList = false;
+                ct.isSurveyOn = false;
+                ct.recSurveyPt = false;
+                ct.isOKtoSurvey = false;
+                ct.markBM = false;
+                ct.recBoundary = false;
+                ct.readyForBM = false;
+
+                btnAGSmode.Visible = false;
+                btnAGSboundary.Visible = false;
+                btnAGSquality.Visible = false;
+                btnAGSstart.Visible = false;
+
+                btnAGS.Text = "Create AGS file";
+            }
+        }
+
+        private void btnAGSquality_Click(object sender, EventArgs e)
+        {
+            if (ct.FloatIsOK)
+            {
+                ct.FloatIsOK = false;
+                btnAGSquality.Text = "RTK FIX only";
+            }
+            else
+            {
+                ct.FloatIsOK = true;
+                btnAGSquality.Text = "RTK or float";
+            }
+        }
+
+        private void btnAGSstart_Click(object sender, EventArgs e)
+        {
+            if (ct.isBtnStartPause)
+            {
+                btnAGSstart.Text = "START";
+                ct.isBtnStartPause = false;
+            }
+            else
+            {
+                btnAGSstart.Text = "PAUSE";
+                ct.isBtnStartPause = true;
+            }
+        }
+
+        private void btnAGSboundary_Click(object sender, EventArgs e)
+        {
+            if (ct.isBoundarySideRight)
+            {
+                btnAGSboundary.Text = "Boundary Left";
+                ct.isBoundarySideRight = false;
+            }
+            else
+            {
+                btnAGSboundary.Text = "Boundary Right";
+                ct.isBoundarySideRight = true;
+            }
+        }
+
+        private void btnAGSmode_Click(object sender, EventArgs e)
+        {
+            
+            if (ct.recSurveyPt)
+            {
+                ct.isSurveyOn = false;
+            }
+            if (ct.readyForBM)
+            {
+                ct.markBM = true;
+                ct.isBtnStartPause = false;
+                btnAGSmode.Text = "Boundary";
+                btnAGSstart.Text = "START";
+            }
+            if (ct.recBoundary)
+            {
+                ct.recBoundary = false;
+                ct.recSurveyPt = true;
+                btnAGSboundary.Visible = false;
+                ct.isBtnStartPause = false;
+                btnAGSmode.Text = "Click to finish";
+                btnAGSstart.Text = "START";
+            }
+        }
+
         private void keyboardToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             isKeyboardOn = !isKeyboardOn;

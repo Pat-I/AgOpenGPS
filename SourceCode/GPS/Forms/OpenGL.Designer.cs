@@ -14,6 +14,8 @@ namespace AgOpenGPS
         //extracted Near, Far, Right, Left clipping planes of frustum
         public double[] frustum = new double[24];
 
+        public bool isSurveyStandby;
+
         private bool isInit = false;
         private double fovy = 0.7;
         private double camDistanceFactor = -4;
@@ -376,6 +378,52 @@ namespace AgOpenGPS
                     //draw Boundaries
                     bnd.DrawBoundaryLines();
 
+                    //here is the stuff for ags file
+                    if (isSurveyStandby)
+                    {
+                        ct.CreateAGSlist();
+
+                        //draw the stuff
+                        int ptCount = ct.surveyList.Count;
+
+                        if (ptCount > 0)
+                        {
+
+
+                            GL.PointSize(4.0f);
+                            GL.Begin(PrimitiveType.Points);
+
+                            GL.Color3(0.97f, 0.42f, 0.45f);
+                            for (int h = 0; h < ptCount; h++)
+                            {
+                                GL.Color3(0.97f, 0.42f, 0.45f);
+
+                                if (ct.surveyList[h].code == 0) GL.Color3(0.97f, 0.82f, 0.05f);
+                                if (ct.surveyList[h].code == 2) GL.Color3(0.5f, 0.82f, 0.55f);
+
+                                GL.Vertex3(ct.surveyList[h].easting, ct.surveyList[h].northing, 0);
+                            }
+
+                            GL.End();
+                        }
+
+                        //Draw a contour line
+
+
+
+                        GL.LineWidth(2);
+                        GL.Color3(0.98f, 0.2f, 0.0f);
+                        GL.Begin(PrimitiveType.Lines);
+                        for (int h = 0; h < ptCount; h++)
+                        {
+                            if (ct.surveyList[h].code == 2)
+                                GL.Vertex3(ct.surveyList[h].easting, ct.surveyList[h].northing, 0);
+
+                        }
+                        GL.End();
+
+                    }
+
                     //draw the turnLines
                     if (yt.isYouTurnBtnOn)
                     {
@@ -502,6 +550,9 @@ namespace AgOpenGPS
                             oglZoom.Refresh();
                         }
                     }
+
+
+                   
                 }
             }
         }
