@@ -1021,7 +1021,7 @@
             this.btnResetSim.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResetSim.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnResetSim.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnResetSim.Location = new System.Drawing.Point(579, 4);
+            this.btnResetSim.Location = new System.Drawing.Point(577, 4);
             this.btnResetSim.Name = "btnResetSim";
             this.btnResetSim.Size = new System.Drawing.Size(52, 31);
             this.btnResetSim.TabIndex = 164;
@@ -1037,7 +1037,7 @@
             this.btnResetSteerAngle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResetSteerAngle.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnResetSteerAngle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnResetSteerAngle.Location = new System.Drawing.Point(514, 4);
+            this.btnResetSteerAngle.Location = new System.Drawing.Point(512, 4);
             this.btnResetSteerAngle.Name = "btnResetSteerAngle";
             this.btnResetSteerAngle.Size = new System.Drawing.Size(58, 31);
             this.btnResetSteerAngle.TabIndex = 162;
@@ -1062,10 +1062,10 @@
             this.hsbarSteerAngle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hsbarSteerAngle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.hsbarSteerAngle.LargeChange = 20;
-            this.hsbarSteerAngle.Location = new System.Drawing.Point(329, 1);
+            this.hsbarSteerAngle.Location = new System.Drawing.Point(328, 1);
             this.hsbarSteerAngle.Maximum = 800;
             this.hsbarSteerAngle.Name = "hsbarSteerAngle";
-            this.hsbarSteerAngle.Size = new System.Drawing.Size(165, 37);
+            this.hsbarSteerAngle.Size = new System.Drawing.Size(164, 37);
             this.hsbarSteerAngle.TabIndex = 179;
             this.hsbarSteerAngle.Value = 400;
             this.hsbarSteerAngle.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hsbarSteerAngle_Scroll);
@@ -1078,7 +1078,7 @@
             this.hsbarStepDistance.Location = new System.Drawing.Point(82, 1);
             this.hsbarStepDistance.Minimum = -6;
             this.hsbarStepDistance.Name = "hsbarStepDistance";
-            this.hsbarStepDistance.Size = new System.Drawing.Size(165, 37);
+            this.hsbarStepDistance.Size = new System.Drawing.Size(164, 37);
             this.hsbarStepDistance.TabIndex = 178;
             this.hsbarStepDistance.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hsbarStepDistance_Scroll);
             // 
@@ -2406,7 +2406,7 @@
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 134F));
+            this.panelSim.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 136F));
             this.panelSim.Controls.Add(this.btnReverseDirection, 0, 0);
             this.panelSim.Controls.Add(this.btnResetSteerAngle, 4, 0);
             this.panelSim.Controls.Add(this.hsbarSteerAngle, 3, 0);
@@ -2446,7 +2446,7 @@
             this.btnSimSetSpeedToZero.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSimSetSpeedToZero.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.btnSimSetSpeedToZero.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSimSetSpeedToZero.Location = new System.Drawing.Point(256, 4);
+            this.btnSimSetSpeedToZero.Location = new System.Drawing.Point(255, 4);
             this.btnSimSetSpeedToZero.Name = "btnSimSetSpeedToZero";
             this.btnSimSetSpeedToZero.Size = new System.Drawing.Size(63, 31);
             this.btnSimSetSpeedToZero.TabIndex = 453;
@@ -2635,28 +2635,30 @@
             // 
             // btnAGS
             // 
-            this.btnAGS.Location = new System.Drawing.Point(0, 540);
+            this.btnAGS.Location = new System.Drawing.Point(0, 569);
             this.btnAGS.Name = "btnAGS";
             this.btnAGS.Size = new System.Drawing.Size(71, 73);
             this.btnAGS.TabIndex = 453;
-            this.btnAGS.Text = "create AGS file";
+            this.btnAGS.Text = "Create AGS file";
             this.btnAGS.UseVisualStyleBackColor = true;
             this.btnAGS.Click += new System.EventHandler(this.btnAGS_Click);
             // 
             // btnAGSmode
             // 
-            this.btnAGSmode.Location = new System.Drawing.Point(530, 82);
+            this.btnAGSmode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAGSmode.Location = new System.Drawing.Point(930, 79);
             this.btnAGSmode.Name = "btnAGSmode";
             this.btnAGSmode.Size = new System.Drawing.Size(75, 68);
             this.btnAGSmode.TabIndex = 454;
-            this.btnAGSmode.Text = "put BenchMark";
+            this.btnAGSmode.Text = "put MB";
             this.btnAGSmode.UseVisualStyleBackColor = true;
             this.btnAGSmode.Visible = false;
             this.btnAGSmode.Click += new System.EventHandler(this.btnAGSmode_Click);
             // 
             // btnAGSstart
             // 
-            this.btnAGSstart.Location = new System.Drawing.Point(623, 82);
+            this.btnAGSstart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAGSstart.Location = new System.Drawing.Point(930, 158);
             this.btnAGSstart.Name = "btnAGSstart";
             this.btnAGSstart.Size = new System.Drawing.Size(75, 68);
             this.btnAGSstart.TabIndex = 455;
@@ -2667,18 +2669,20 @@
             // 
             // btnAGSboundary
             // 
-            this.btnAGSboundary.Location = new System.Drawing.Point(713, 82);
+            this.btnAGSboundary.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAGSboundary.Location = new System.Drawing.Point(930, 234);
             this.btnAGSboundary.Name = "btnAGSboundary";
             this.btnAGSboundary.Size = new System.Drawing.Size(75, 68);
             this.btnAGSboundary.TabIndex = 456;
-            this.btnAGSboundary.Text = "boundary Left";
+            this.btnAGSboundary.Text = "Bnd Left";
             this.btnAGSboundary.UseVisualStyleBackColor = true;
             this.btnAGSboundary.Visible = false;
             this.btnAGSboundary.Click += new System.EventHandler(this.btnAGSboundary_Click);
             // 
             // btnAGSquality
             // 
-            this.btnAGSquality.Location = new System.Drawing.Point(803, 82);
+            this.btnAGSquality.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAGSquality.Location = new System.Drawing.Point(930, 310);
             this.btnAGSquality.Name = "btnAGSquality";
             this.btnAGSquality.Size = new System.Drawing.Size(75, 68);
             this.btnAGSquality.TabIndex = 457;

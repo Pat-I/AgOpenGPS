@@ -1307,13 +1307,8 @@ namespace AgOpenGPS
                 {
                     mf.FileSaveSurveyPt();
 
-                    recSurveyPt = false;
-                    mf.isSurveyStandby = false;
-                    mf.btnAGSmode.Visible = false;
-                    mf.btnAGSboundary.Visible = false;
-                    mf.btnAGSquality.Visible = false;
-                    mf.btnAGSstart.Visible = false;
-                    mf.btnAGS.Text = "Create AGS file";
+                    mf.CancelAGS();
+                    
                 }
 
                 

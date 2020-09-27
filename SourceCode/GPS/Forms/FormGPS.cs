@@ -1178,7 +1178,7 @@ namespace AgOpenGPS
 
         private void btnAGS_Click(object sender, EventArgs e)
         {
-            if (!isSurveyStandby)
+            if (!isSurveyStandby && isJobStarted)
             {
                 isSurveyStandby = true;
                 ct.clearSurveyList = true;
@@ -1193,22 +1193,28 @@ namespace AgOpenGPS
             else
             // cancel all
             {
-                isSurveyStandby = false;
-                ct.clearSurveyList = false;
-                ct.isSurveyOn = false;
-                ct.recSurveyPt = false;
-                ct.isOKtoSurvey = false;
-                ct.markBM = false;
-                ct.recBoundary = false;
-                ct.readyForBM = false;
-
-                btnAGSmode.Visible = false;
-                btnAGSboundary.Visible = false;
-                btnAGSquality.Visible = false;
-                btnAGSstart.Visible = false;
-
-                btnAGS.Text = "Create AGS file";
+                CancelAGS();
             }
+        }
+
+        public void CancelAGS()
+        {
+            isSurveyStandby = false;
+            ct.clearSurveyList = false;
+            ct.isSurveyOn = false;
+            ct.recSurveyPt = false;
+            ct.isOKtoSurvey = false;
+            ct.markBM = false;
+            ct.recBoundary = false;
+            ct.readyForBM = false;
+
+            btnAGSmode.Visible = false;
+            btnAGSboundary.Visible = false;
+            btnAGSquality.Visible = false;
+            btnAGSstart.Visible = false;
+
+            btnAGS.Text = "Create AGS file";
+            btnAGSmode.Text = "Put MB";
         }
 
         private void btnAGSquality_Click(object sender, EventArgs e)
@@ -1243,12 +1249,12 @@ namespace AgOpenGPS
         {
             if (ct.isBoundarySideRight)
             {
-                btnAGSboundary.Text = "Boundary Left";
+                btnAGSboundary.Text = "Bnd Left";
                 ct.isBoundarySideRight = false;
             }
             else
             {
-                btnAGSboundary.Text = "Boundary Right";
+                btnAGSboundary.Text = "Bnd Right";
                 ct.isBoundarySideRight = true;
             }
         }
@@ -1264,7 +1270,7 @@ namespace AgOpenGPS
             {
                 ct.markBM = true;
                 ct.isBtnStartPause = false;
-                btnAGSmode.Text = "Boundary";
+                btnAGSmode.Text = "Click if Bnd done";
                 btnAGSstart.Text = "START";
             }
             if (ct.recBoundary)
@@ -1734,6 +1740,9 @@ namespace AgOpenGPS
 
             //reset all Port Module values
             mc.ResetAllModuleCommValues();
+
+            //cancel ags survey
+            CancelAGS();
         }
 
         //bring up field dialog for new/open/resume

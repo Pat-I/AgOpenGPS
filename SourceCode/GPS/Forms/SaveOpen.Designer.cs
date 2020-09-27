@@ -2174,7 +2174,7 @@ namespace AgOpenGPS
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
 
-            string myFileName = "Survey.ags";
+            string myFileName = "Survey_" + String.Format("{0}", DateTime.Now.ToString("yyyy_MMM_dd HH_mm", CultureInfo.InvariantCulture)) + ".ags";
 
             //write out the file
             using (StreamWriter writer = new StreamWriter(dirField + myFileName))
@@ -2228,7 +2228,83 @@ namespace AgOpenGPS
                     }
                 }
             }
-            
+            FileSaveAGD();  
+        }
+
+        //Build an AGD file to test the ags builder.
+        public void FileSaveAGD()
+        {
+            //1  - points in patch
+            //64.697,0.168,-21.654,0 - east, heading, north, altitude
+            //Saturday, February 11, 2017  -->  7:26:52 AM
+            //12  - points in patch
+            //64.697,0.168,-21.654,0 - east, heading, north, altitude
+            //$ContourDir
+            //Bob_Feb11
+            //$Offsets
+            //533172,5927719,12
+
+            //get the directory and make sure it exists, create if not
+            string dirField = fieldsDirectory + currentFieldDirectory + "\\";
+
+            string directoryName = Path.GetDirectoryName(dirField);
+            if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
+            { Directory.CreateDirectory(directoryName); }
+
+            string myFileName = "SurveyTest_" + String.Format("{0}", DateTime.Now.ToString("yyyy_MMM_dd HH_mm", CultureInfo.InvariantCulture)) + ".agd";
+
+            //write out the file
+            using (StreamWriter writer = new StreamWriter(dirField + myFileName))
+            {
+
+                writer.WriteLine("Latitude(deg), Longitude(deg), Elevation Existing(m), Elevation Proposed(m), CutFill(m), Code, Comments");
+
+                //make sure there is something to save
+                if (ct.surveyList.Count() > 0)
+                {
+                    int count4 = ct.surveyList.Count;
+
+                    //for every new chunk of patch in the whole section
+
+                    //writer.WriteLine(count4.ToString(CultureInfo.InvariantCulture));
+
+                    for (int i = 0; i < count4; i++)
+                    {
+                        if (ct.surveyList[i].code == 0)
+                        {
+                            writer.WriteLine(Math.Round((ct.surveyList[i].latitude), 9).ToString(CultureInfo.InvariantCulture) + ", " +
+
+                            Math.Round(ct.surveyList[i].longitude, 9).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(ct.surveyList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", , , MB");
+
+                        }
+
+                        if (ct.surveyList[i].code == 2)
+                        {
+                            writer.WriteLine(Math.Round((ct.surveyList[i].latitude), 9).ToString(CultureInfo.InvariantCulture) + ", " +
+
+                            Math.Round(ct.surveyList[i].longitude, 9).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(ct.surveyList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(ct.surveyList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", 0, 3GRD");
+
+                        }
+
+                        if (ct.surveyList[i].code == 3)
+                        {
+                            writer.WriteLine(Math.Round((ct.surveyList[i].latitude), 9).ToString(CultureInfo.InvariantCulture) + ", " +
+
+                            Math.Round(ct.surveyList[i].longitude, 9).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(ct.surveyList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", " +
+                            Math.Round(ct.surveyList[i].altitude, 3).ToString(CultureInfo.InvariantCulture) + ", 0, 3GRD");
+
+                        }
+
+
+
+                    }
+                }
+            }
+
         }
 
         //save the boundary

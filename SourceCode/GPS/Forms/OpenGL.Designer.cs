@@ -413,7 +413,7 @@ namespace AgOpenGPS
 
                         GL.LineWidth(2);
                         GL.Color3(0.98f, 0.2f, 0.0f);
-                        GL.Begin(PrimitiveType.Lines);
+                        GL.Begin(PrimitiveType.LineLoop);
                         for (int h = 0; h < ptCount; h++)
                         {
                             if (ct.surveyList[h].code == 2)
