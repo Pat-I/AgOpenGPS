@@ -122,33 +122,107 @@ namespace AgOpenGPS
 
             //antenna
             GL.Color3(0.0f, 0.95f, 0.95f);
-            GL.Vertex3(0, antennaPivot, 0);
+            GL.Vertex3(antennaOffset, antennaPivot, 0);
 
-            //hitch pin
-            GL.Color3(0.95f, 0.0f, 0.0f);
-            GL.Vertex3(0, mf.tool.hitchLength, 0);
-
-            ////rear Tires
-            //GL.PointSize(12.0f);
-            //GL.Color3(0, 0, 0);
-            //GL.Vertex3(-1.8, 0, 0);
-            //GL.Vertex3(1.8, 0, 0);
+            //hitch pin for 4wd and tractor
+            if (vehicleType != 1)
+            {
+                GL.Color3(0.95f, 0.0f, 0.0f);
+                GL.Vertex3(0, mf.tool.hitchLength, 0);
+            }
             GL.End();
 
-            ////draw the vehicle Body
+            // Tires
+            if (vehicleType == 0)//tractor
+            {
+                //Rear Tires, pivot axle
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(-1.4, 1.1, 0);
+                GL.Vertex3(-1.4, -1.1, 0);
+                GL.Vertex3(-.7, -1.1, 0);
+                GL.Vertex3(-.7, 1.1, 0);
+                GL.End();
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(1.4, 1.1, 0);
+                GL.Vertex3(1.4, -1.1, 0);
+                GL.Vertex3(.7, -1.1, 0);
+                GL.Vertex3(.7, 1.1, 0);
+                GL.End();
+                //front Tires
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(-1.3, wheelbase + .7, 0);
+                GL.Vertex3(-1.3, wheelbase - .7, 0);
+                GL.Vertex3(-.75, wheelbase - .7, 0);
+                GL.Vertex3(-.75, wheelbase + .7, 0);
+                GL.End();
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(1.3, wheelbase + .7, 0);
+                GL.Vertex3(1.3, wheelbase - .7, 0);
+                GL.Vertex3(.75, wheelbase - .7, 0);
+                GL.Vertex3(.75, wheelbase + .7, 0);
+                GL.End();
+            }
 
+            if (vehicleType == 1)//harvester
+            {
+                //Front Tires, pivot axle
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(-2, .9, 0);
+                GL.Vertex3(-2, -.9, 0);
+                GL.Vertex3(-1.2, -.9, 0);
+                GL.Vertex3(-1.2, .9, 0);
+                GL.End();
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(2, .9, 0);
+                GL.Vertex3(2, -.9, 0);
+                GL.Vertex3(1.2, -.9, 0);
+                GL.Vertex3(1.2, .9, 0);
+                GL.End();
+                //rear Tires
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(-1.65, -wheelbase + .6, 0);
+                GL.Vertex3(-1.65, -wheelbase - .6, 0);
+                GL.Vertex3(-1.2, -wheelbase - .6, 0);
+                GL.Vertex3(-1.2, -wheelbase + .6, 0);
+                GL.End();
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(0, 0, 0);
+                GL.Vertex3(1.65, -wheelbase + .6, 0);
+                GL.Vertex3(1.65, -wheelbase - .6, 0);
+                GL.Vertex3(1.2, -wheelbase - .6, 0);
+                GL.Vertex3(1.2, -wheelbase + .6, 0);
+                GL.End();
+            }
+
+
+
+            ////draw the vehicle Body
+            
             if (!mf.vehicle.isHydLiftOn)
             {
+                /*
                 GL.Color3(0.9, 0.90, 0.0);
                 GL.Begin(PrimitiveType.TriangleFan);
-                GL.Vertex3(0, antennaPivot, -0.0);
-                GL.Vertex3(1.0, -0, 0.0);
+                GL.Vertex3(.6, 0, -0.0);
+                GL.Vertex3(-.6, -.5, 0.0);
                 GL.Color3(0.0, 0.90, 0.92);
-                GL.Vertex3(0, wheelbase, 0.0);
+                GL.Vertex3(-.6, 1, 0.0);
+                GL.Vertex3(-.3, 1, 0.0);
+                GL.Vertex3(-.3, wheelbase + .6, 0.0);
                 GL.Color3(0.920, 0.0, 0.9);
-                GL.Vertex3(-1.0, -0, 0.0);
-                GL.Vertex3(1.0, -0, 0.0);
+                GL.Vertex3(.3, wheelbase + .6, 0.0);
+                GL.Vertex3(.3, 1, 0.0);
+                GL.Vertex3(.6, 1, 0.0);
+                GL.Vertex3(.6, -.5, -0.0);
                 GL.End();
+                */
             }
             else
             {
@@ -174,8 +248,18 @@ namespace AgOpenGPS
                     GL.Vertex3(1.0, -0, 0.0);
                     GL.End();
                 }
+                GL.LineWidth(3);
+                GL.Color3(0.0, 0.0, 0.0);
+                GL.Begin(PrimitiveType.LineLoop);
+                {
+                    GL.Vertex3(-1.0, 0, 0);
+                    GL.Vertex3(1.0, 0, 0);
+                    GL.Vertex3(0, wheelbase, 0);
+                }
+                GL.End();
             }
-
+            
+            /*
             GL.LineWidth(3);
             GL.Color3(0.0, 0.0, 0.0);
             GL.Begin(PrimitiveType.LineLoop);
@@ -185,6 +269,7 @@ namespace AgOpenGPS
                 GL.Vertex3(0, wheelbase, 0);
             }
             GL.End();
+            */
 
             GL.Begin(PrimitiveType.TriangleFan);
             {
@@ -221,7 +306,7 @@ namespace AgOpenGPS
                         GL.Vertex3(0.0, 0, 0);
                         GL.Color3(0.970, 0.920, 0.20);
                         GL.Vertex3(mf.bnd.createBndOffset, 0, 0);
-                        GL.Vertex3(mf.bnd.createBndOffset*0.75, 0.25, 0);
+                        GL.Vertex3(mf.bnd.createBndOffset * 0.75, 0.25, 0);
                     }
                     GL.End();
 
@@ -237,7 +322,7 @@ namespace AgOpenGPS
                         GL.Vertex3(0.0, 0, 0);
                         GL.Color3(0.970, 0.920, 0.20);
                         GL.Vertex3(-mf.bnd.createBndOffset, 0, 0);
-                        GL.Vertex3(-mf.bnd.createBndOffset*0.75, 0.25, 0);
+                        GL.Vertex3(-mf.bnd.createBndOffset * 0.75, 0.25, 0);
                     }
                     GL.End();
                 }
@@ -261,7 +346,7 @@ namespace AgOpenGPS
             {
                 GL.Color4(0.969, 0.95, 0.9510, 0.87);
                 if (mf.curve.curveNumber < 0)
-                mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "L", 1.5);
+                    mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "L", 1.5);
                 else mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString() + "R", 1.5);
             }
             else if (mf.ABLine.isBtnABLineOn && !mf.ct.isContourBtnOn)
@@ -269,16 +354,19 @@ namespace AgOpenGPS
                 GL.Color4(0.96, 0.95, 0.9510, 0.87);
 
                 if (mf.ABLine.passNumber < 0)
-                mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "L", 1.5);
+                    mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "L", 1.5);
                 else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString() + "R", 1.5);
             }
 
-            //draw the rigid hitch
+            //draw the rigid hitch if 4wd or tractor
+            if (vehicleType != 1)
+            {           
             GL.Color3(0.37f, 0.37f, 0.97f);
             GL.Begin(PrimitiveType.Lines);
             GL.Vertex3(0, mf.tool.hitchLength, 0);
             GL.Vertex3(0, 0, 0);
             GL.End();
+            }
 
             GL.LineWidth(1);
 
