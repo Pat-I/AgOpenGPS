@@ -141,12 +141,59 @@ namespace AgOpenGPS
             //draw the hitch if trailing
             if (isToolTrailing)
             {
-                GL.LineWidth(2);
-                GL.Color3(0.7f, 0.7f, 0.97f);
-                GL.Begin(PrimitiveType.Lines);
-                GL.Vertex3(0.0, trailingTool, 0.0);
-                GL.Vertex3(0, 0, 0);
-                GL.End();
+                if (isToolTBT)
+                {
+
+                    GL.LineWidth(2);
+                    GL.Color3(0.7f, 0.7f, 0.97f);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex3(0.0, trailingTool, 0.0);
+                    GL.Vertex3(0, 0, 0);
+                    GL.End();
+                }
+                else
+                {
+                    //adjust trailingTool lenght
+                    //trailingTool += trailingTank;
+
+                    //line from hitch to axle
+                    GL.LineWidth(2);
+                    GL.Color3(0.7f, 0.7f, 0.97f);
+                    GL.Begin(PrimitiveType.Lines);                                       
+                    GL.Vertex3(0.0, trailingTank, 0.0);
+                    GL.Vertex3(0, 0, 0);
+                    //axle to ramp
+                    GL.Color3(0.7f, 0.7f, 0.97f);
+                    GL.Vertex3(0.0, trailingTool, 0.0);
+                    GL.Vertex3(0, trailingTank, 0);
+                    GL.End();
+
+
+                    // draw the axle center pt
+                    GL.Color3(0.95f, 0.95f, 0f);
+                    GL.PointSize(6f);
+                    GL.Begin(PrimitiveType.Points);
+                    GL.Vertex3(0.0, trailingTank, 0.0);
+                    GL.End();
+
+                    //tool Tires
+                    GL.Begin(PrimitiveType.LineLoop);
+                    GL.Color3(0, 0, 0);
+                    GL.Vertex3(-1.3, trailingTank + .7, 0);
+                    GL.Vertex3(-1.3, trailingTank - .7, 0);
+                    GL.Vertex3(-.75, trailingTank - .7, 0);
+                    GL.Vertex3(-.75, trailingTank + .7, 0);
+                    GL.End();
+                    GL.Begin(PrimitiveType.LineLoop);
+                    GL.Color3(0, 0, 0);
+                    GL.Vertex3(1.3, trailingTank + .7, 0);
+                    GL.Vertex3(1.3, trailingTank - .7, 0);
+                    GL.Vertex3(.75, trailingTank - .7, 0);
+                    GL.Vertex3(.75, trailingTank + .7, 0);
+                    GL.End();
+
+
+                }
             }
 
             //look ahead lines

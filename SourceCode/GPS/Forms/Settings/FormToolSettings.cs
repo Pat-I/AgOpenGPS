@@ -702,11 +702,11 @@ namespace AgOpenGPS
 
                 nudForeAft.Visible = true;
                 nudHitchLength.Visible = true;
-                nudTankHitch.Visible = false;
+                nudTankHitch.Visible = true;
 
-                nudForeAft.Left = 596;
-                nudHitchLength.Left = 384;
-                nudTankHitch.Left = 0;
+                nudForeAft.Left = 700;
+                nudHitchLength.Left = 284;
+                nudTankHitch.Left = 486;
 
                 tabHitch.BackgroundImage = Properties.Resources.ToolHitchPageTrailing;
 

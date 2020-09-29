@@ -786,7 +786,7 @@ namespace AgOpenGPS
             if (tool.isToolTrailing)
             {
                 double over;
-                if (tool.isToolTBT)
+                //if (tool.isToolTBT)
                 {
                     //Torriem rules!!!!! Oh yes, this is all his. Thank-you
                     if (distanceCurrentStepFix != 0)
@@ -814,37 +814,48 @@ namespace AgOpenGPS
                         tankPos.northing = hitchPos.northing + (Math.Cos(tankPos.heading) * (tool.toolTankTrailingHitchLength));
                     }
                 }
-                else
+                /*else
                 {
                     tankPos.heading = fixHeading;
                     tankPos.easting = hitchPos.easting;
                     tankPos.northing = hitchPos.northing;
                 }
-
+                */
                 //Torriem rules!!!!! Oh yes, this is all his. Thank-you
-                if (distanceCurrentStepFix != 0)
+                if (tool.isToolTBT)
                 {
-                    double t = (tool.toolTrailingHitchLength) / distanceCurrentStepFix;
-                    toolPos.easting = tankPos.easting + t * (tankPos.easting - toolPos.easting);
-                    toolPos.northing = tankPos.northing + t * (tankPos.northing - toolPos.northing);
-                    toolPos.heading = Math.Atan2(tankPos.easting - toolPos.easting, tankPos.northing - toolPos.northing);
+
+
+                    if (distanceCurrentStepFix != 0)
+                    {
+                        double t = (tool.toolTrailingHitchLength) / distanceCurrentStepFix;
+                        toolPos.easting = tankPos.easting + t * (tankPos.easting - toolPos.easting);
+                        toolPos.northing = tankPos.northing + t * (tankPos.northing - toolPos.northing);
+                        toolPos.heading = Math.Atan2(tankPos.easting - toolPos.easting, tankPos.northing - toolPos.northing);
+                    }
+
+                    ////the tool is seriously jacknifed or just starting out so just spring it back.
+                    over = Math.Abs(Math.PI - Math.Abs(Math.Abs(toolPos.heading - tankPos.heading) - Math.PI));
+
+                    if (over < 1.9 && startCounter > 50)
+                    {
+                        toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
+                        toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
+                    }
+
+                    //criteria for a forced reset to put tool directly behind vehicle
+                    if (over > 1.9 | startCounter < 51)
+                    {
+                        toolPos.heading = tankPos.heading;
+                        toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
+                        toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
+                    }
                 }
-
-                ////the tool is seriously jacknifed or just starting out so just spring it back.
-                over = Math.Abs(Math.PI - Math.Abs(Math.Abs(toolPos.heading - tankPos.heading) - Math.PI));
-
-                if (over < 1.9 && startCounter > 50)
-                {
-                    toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
-                    toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
-                }
-
-                //criteria for a forced reset to put tool directly behind vehicle
-                if (over > 1.9 | startCounter < 51)
+                else
                 {
                     toolPos.heading = tankPos.heading;
-                    toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
-                    toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
+                    toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength - tool.toolTankTrailingHitchLength));
+                    toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength - tool.toolTankTrailingHitchLength));
                 }
             }
 
