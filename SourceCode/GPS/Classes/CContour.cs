@@ -1186,8 +1186,18 @@ namespace AgOpenGPS
                     {
                         double surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight);
 
-                        double actualEasting = mf.pivotAxlePos.easting + mf.pn.utmEast;
-                        double actualNorthing = mf.pivotAxlePos.northing + mf.pn.utmNorth;
+                        double actualEasting = mf.pivotAxlePos.easting;
+                        double actualNorthing = mf.pivotAxlePos.northing;
+
+                        double east = actualEasting;
+                        double nort = actualNorthing;
+
+                        //fix the azimuth error
+                        actualEasting = (Math.Cos(mf.pn.convergenceAngle) * east) - (Math.Sin(mf.pn.convergenceAngle) * nort);
+                        actualNorthing = (Math.Sin(mf.pn.convergenceAngle) * east) + (Math.Cos(mf.pn.convergenceAngle) * nort);
+
+                        actualEasting += mf.pn.utmEast;
+                        actualNorthing += mf.pn.utmNorth;
 
                         mf.UTMToLatLon(actualEasting, actualNorthing);
            
@@ -1236,8 +1246,18 @@ namespace AgOpenGPS
                             if (surveyDistance > 9)
                             {
                                 // convert the utm from the side of the blade to lat long
-                                double actualEasting = sideEasting + mf.pn.utmEast;
-                                double actualNorthing = sideNorthing + mf.pn.utmNorth;
+                                double actualEasting = sideEasting;
+                                double actualNorthing = sideNorthing;
+
+                                double east = actualEasting;
+                                double nort = actualNorthing;
+
+                                //fix the azimuth error
+                                actualEasting = (Math.Cos(mf.pn.convergenceAngle) * east) - (Math.Sin(mf.pn.convergenceAngle) * nort);
+                                actualNorthing = (Math.Sin(mf.pn.convergenceAngle) * east) + (Math.Cos(mf.pn.convergenceAngle) * nort);
+
+                                actualEasting += mf.pn.utmEast;
+                                actualNorthing += mf.pn.utmNorth;
 
                                 mf.UTMToLatLon(actualEasting, actualNorthing);
 
@@ -1280,8 +1300,18 @@ namespace AgOpenGPS
                             {
                                 double surveyAlt = mf.pn.altitude - Math.Abs(Math.Cos(glm.toRadians((rollUsedForAGS))) * mf.vehicle.antennaHeight);
 
-                                double actualEasting = mf.pivotAxlePos.easting + mf.pn.utmEast;
-                                double actualNorthing = mf.pivotAxlePos.northing + mf.pn.utmNorth;
+                                double actualEasting = mf.pivotAxlePos.easting;
+                                double actualNorthing = mf.pivotAxlePos.northing;
+
+                                double east = actualEasting;
+                                double nort = actualNorthing;
+
+                                //fix the azimuth error
+                                actualEasting = (Math.Cos(mf.pn.convergenceAngle) * east) - (Math.Sin(mf.pn.convergenceAngle) * nort);
+                                actualNorthing = (Math.Sin(mf.pn.convergenceAngle) * east) + (Math.Cos(mf.pn.convergenceAngle) * nort);
+
+                                actualEasting += mf.pn.utmEast;
+                                actualNorthing += mf.pn.utmNorth;
 
                                 mf.UTMToLatLon(actualEasting, actualNorthing);
 
