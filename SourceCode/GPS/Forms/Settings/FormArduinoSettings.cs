@@ -11,6 +11,7 @@ namespace AgOpenGPS
         //class variables
         private readonly FormGPS mf = null;
 
+        byte tempTransducerSP;
 
         //constructor
         public FormArduinoSettings(Form callingForm)
@@ -35,7 +36,7 @@ namespace AgOpenGPS
             chkInvertSteer.Text = gStr.gsInvertSteerDirection;
             chkInvertRoll.Text = gStr.gsInvertRoll;
             chkBNOInstalled.Text = gStr.gsBNOInstalled;
-            cboxEncoder.Text = gStr.gsEncoder;
+            cboxEncoder.Text = "Press Transducer";
             label7.Text = gStr.gsEncoderCounts;
             label9.Text = gStr.gsSendToModule;
             groupBox5.Text = gStr.gsToAutoSteer;
@@ -137,6 +138,10 @@ namespace AgOpenGPS
             cboxIsHydOn.Checked = Properties.Vehicle.Default.setArdMac_isHydEnabled > 0;
 
             cboxIsSendMachineControlToAutoSteer.Checked = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
+
+            //pressure transducer---------------------------------------------------------------------------------------------
+
+            tempTransducerSP = mf.vehicle.transducerSP;
 
         }
 
@@ -289,6 +294,11 @@ namespace AgOpenGPS
             if (cboxIsHydOn.Checked) Properties.Vehicle.Default.setArdMac_isHydEnabled = (byte)1;
             else Properties.Vehicle.Default.setArdMac_isHydEnabled = (byte)0;
             mf.mc.ardMachineConfig[mf.mc.amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
+
+            //Press Transducer------------------------------------------------------------------------------------------------------
+
+            mf.vehicle.transducerSP = tempTransducerSP;
+            Properties.Settings.Default.setAS_transducerSP = tempTransducerSP;
         }
 
         private void btnSendToMachineArduino_Click(object sender, EventArgs e)
@@ -374,6 +384,18 @@ namespace AgOpenGPS
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            prgBtransducerPres.Value = mf.vehicle.transducerPressure;
+            prgBtransducerSP.Value = tempTransducerSP;
+            hStransducerSP.Value = tempTransducerSP;
+        }
+
+        private void hStransducerSP_ValueChanged(object sender, EventArgs e)
+        {
+            tempTransducerSP = (Byte)hStransducerSP.Value;
         }
     }
 }

@@ -89,6 +89,8 @@ namespace AgOpenGPS
 
                         int.TryParse(words[7], out mc.pwmDisplay);
 
+                        int.TryParse(words[8], out vehicle.transducerPressure);
+
                         break;
 
                     // 127,230, 2=checksum, 8 = ino version

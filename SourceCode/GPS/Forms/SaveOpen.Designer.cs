@@ -307,7 +307,7 @@ namespace AgOpenGPS
                 writer.WriteLine("LowSpeedCutoff," + Properties.Vehicle.Default.setVehicle_slowSpeedCutoff.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("VehicleType," + Properties.Vehicle.Default.setVehicle_vehicleType.ToString(CultureInfo.InvariantCulture));
 
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("TransducerSetPoint," + Properties.Settings.Default.setAS_transducerSP.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
@@ -489,7 +489,9 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_vehicleType = int.Parse(words[1], CultureInfo.InvariantCulture);
 
-                        line = reader.ReadLine();
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Settings.Default.setAS_transducerSP = byte.Parse(words[1], CultureInfo.InvariantCulture);
+
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         line = reader.ReadLine();
@@ -654,6 +656,8 @@ namespace AgOpenGPS
                         minFixStepDist = Properties.Settings.Default.setF_minFixStep;
                         vehicle.slowSpeedCutoff = Properties.Vehicle.Default.setVehicle_slowSpeedCutoff;
                         vehicle.vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
+
+                        vehicle.transducerSP = Properties.Settings.Default.setAS_transducerSP;
 
                         yt.geoFenceDistance = Properties.Vehicle.Default.set_geoFenceDistance;
                         yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;

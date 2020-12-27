@@ -18,6 +18,8 @@ namespace AgOpenGPS
         public double minTurningRadius;
         public double antennaOffset;
         public int vehicleType;
+        public byte transducerSP;
+        public int transducerPressure;
 
         //min vehicle speed allowed before turning shit off
         public double slowSpeedCutoff = 0;
@@ -62,6 +64,8 @@ namespace AgOpenGPS
 
             maxAngularVelocity = Properties.Vehicle.Default.setVehicle_maxAngularVelocity;
             maxSteerAngle = Properties.Vehicle.Default.setVehicle_maxSteerAngle;
+
+            transducerSP = Properties.Settings.Default.setAS_transducerSP;
 
             isHydLiftOn = false;
 

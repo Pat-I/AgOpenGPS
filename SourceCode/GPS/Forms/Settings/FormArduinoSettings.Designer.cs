@@ -73,8 +73,15 @@
             this.label10 = new System.Windows.Forms.Label();
             this.cboxIsHydOn = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.tabTransducer = new System.Windows.Forms.TabPage();
+            this.prgBtransducerSP = new System.Windows.Forms.ProgressBar();
+            this.hStransducerSP = new System.Windows.Forms.HScrollBar();
+            this.prgBtransducerPres = new System.Windows.Forms.ProgressBar();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudMinSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxCounts)).BeginInit();
@@ -86,6 +93,7 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerTime)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRaiseTime)).BeginInit();
+            this.tabTransducer.SuspendLayout();
             this.SuspendLayout();
             // 
             // label2
@@ -145,7 +153,7 @@
             this.cboxEncoder.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.cboxEncoder.Size = new System.Drawing.Size(192, 70);
             this.cboxEncoder.TabIndex = 269;
-            this.cboxEncoder.Text = "Turn Sensor";
+            this.cboxEncoder.Text = "Pres Transducer";
             this.cboxEncoder.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.cboxEncoder.UseVisualStyleBackColor = true;
             // 
@@ -461,6 +469,7 @@
             this.tabcArduino.Appearance = System.Windows.Forms.TabAppearance.Buttons;
             this.tabcArduino.Controls.Add(this.tabAutoSteer);
             this.tabcArduino.Controls.Add(this.tabMachine);
+            this.tabcArduino.Controls.Add(this.tabTransducer);
             this.tabcArduino.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabcArduino.ItemSize = new System.Drawing.Size(260, 50);
             this.tabcArduino.Location = new System.Drawing.Point(12, 12);
@@ -770,6 +779,50 @@
             this.label11.Text = "Lower Time (secs)";
             this.label11.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
+            // tabTransducer
+            // 
+            this.tabTransducer.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.tabTransducer.Controls.Add(this.label15);
+            this.tabTransducer.Controls.Add(this.label14);
+            this.tabTransducer.Controls.Add(this.prgBtransducerSP);
+            this.tabTransducer.Controls.Add(this.hStransducerSP);
+            this.tabTransducer.Controls.Add(this.prgBtransducerPres);
+            this.tabTransducer.Location = new System.Drawing.Point(4, 54);
+            this.tabTransducer.Name = "tabTransducer";
+            this.tabTransducer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabTransducer.Size = new System.Drawing.Size(860, 552);
+            this.tabTransducer.TabIndex = 2;
+            this.tabTransducer.Text = "Pres Transducer";
+            // 
+            // prgBtransducerSP
+            // 
+            this.prgBtransducerSP.Location = new System.Drawing.Point(176, 138);
+            this.prgBtransducerSP.Maximum = 255;
+            this.prgBtransducerSP.Name = "prgBtransducerSP";
+            this.prgBtransducerSP.Size = new System.Drawing.Size(505, 23);
+            this.prgBtransducerSP.TabIndex = 2;
+            this.prgBtransducerSP.Value = 46;
+            // 
+            // hStransducerSP
+            // 
+            this.hStransducerSP.Cursor = System.Windows.Forms.Cursors.Default;
+            this.hStransducerSP.Location = new System.Drawing.Point(156, 217);
+            this.hStransducerSP.Maximum = 255;
+            this.hStransducerSP.Name = "hStransducerSP";
+            this.hStransducerSP.Size = new System.Drawing.Size(539, 94);
+            this.hStransducerSP.TabIndex = 1;
+            this.hStransducerSP.Value = 46;
+            this.hStransducerSP.ValueChanged += new System.EventHandler(this.hStransducerSP_ValueChanged);
+            // 
+            // prgBtransducerPres
+            // 
+            this.prgBtransducerPres.Location = new System.Drawing.Point(176, 65);
+            this.prgBtransducerPres.Maximum = 6640;
+            this.prgBtransducerPres.Name = "prgBtransducerPres";
+            this.prgBtransducerPres.Size = new System.Drawing.Size(505, 76);
+            this.prgBtransducerPres.TabIndex = 0;
+            this.prgBtransducerPres.Value = 1200;
+            // 
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -799,6 +852,35 @@
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
             this.bntOK.Click += new System.EventHandler(this.btnOK_Click);
+            // 
+            // timer2
+            // 
+            this.timer2.Enabled = true;
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            // 
+            // label14
+            // 
+            this.label14.BackColor = System.Drawing.Color.Transparent;
+            this.label14.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label14.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label14.Location = new System.Drawing.Point(176, 33);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(505, 29);
+            this.label14.TabIndex = 254;
+            this.label14.Text = "0V  Pressure Transducer Reading  5V";
+            this.label14.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            // 
+            // label15
+            // 
+            this.label15.BackColor = System.Drawing.Color.Transparent;
+            this.label15.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label15.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label15.Location = new System.Drawing.Point(176, 164);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(505, 29);
+            this.label15.TabIndex = 255;
+            this.label15.Text = "Set Point";
+            this.label15.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // FormArduinoSettings
             // 
@@ -835,6 +917,7 @@
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerTime)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRaiseTime)).EndInit();
+            this.tabTransducer.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -886,5 +969,12 @@
         private System.Windows.Forms.Label lblSent;
         private System.Windows.Forms.Label lblRecd;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TabPage tabTransducer;
+        private System.Windows.Forms.ProgressBar prgBtransducerPres;
+        private System.Windows.Forms.HScrollBar hStransducerSP;
+        private System.Windows.Forms.ProgressBar prgBtransducerSP;
+        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
     }
 }
