@@ -201,7 +201,8 @@
             this.lblNumCu = new System.Windows.Forms.Label();
             this.panelControlBox = new System.Windows.Forms.Panel();
             this.btnGPSData = new System.Windows.Forms.Button();
-            this.btnShutdown = new System.Windows.Forms.Button();
+            this.btnShutdown = new System.Windows.Forms.Button(); 
+                this.btnCancelShutdown = new System.Windows.Forms.Button();
             this.btnMaximizeMainForm = new System.Windows.Forms.Button();
             this.btnMinimizeMainForm = new System.Windows.Forms.Button();
             this.contextMenuStripOpenGL.SuspendLayout();
@@ -2904,37 +2905,11 @@
             // 
             // btnHelp
             // 
-            this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHelp.BackColor = System.Drawing.Color.Transparent;
-            this.btnHelp.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnHelp.FlatAppearance.BorderSize = 0;
-            this.btnHelp.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
-            this.btnHelp.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
-            this.btnHelp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnHelp.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHelp.ForeColor = System.Drawing.Color.DimGray;
-            this.btnHelp.Image = global::AgOpenGPS.Properties.Resources.HelpSmall;
-            this.btnHelp.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnHelp.Location = new System.Drawing.Point(155, 3);
-            this.btnHelp.Name = "btnHelp";
-            this.btnHelp.Size = new System.Drawing.Size(52, 38);
-            this.btnHelp.TabIndex = 495;
-            this.btnHelp.UseVisualStyleBackColor = false;
-            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+            
             // 
             // lblRed
             // 
-            this.lblRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblRed.AutoSize = true;
-            this.lblRed.BackColor = System.Drawing.Color.Transparent;
-            this.lblRed.Font = new System.Drawing.Font("Arial", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRed.Location = new System.Drawing.Point(3, 669);
-            this.lblRed.Name = "lblRed";
-            this.lblRed.Size = new System.Drawing.Size(70, 29);
-            this.lblRed.TabIndex = 543;
-            this.lblRed.Text = "100%";
-            this.lblRed.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            this.lblRed.Visible = false;
+            
             // 
             // btnCancelShutdown
             // 
@@ -2955,7 +2930,7 @@
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(1000, 720);
             this.Controls.Add(this.btnCancelShutdown);
-            this.Controls.Add(this.lblRed);
+            
             this.Controls.Add(this.panelControlBox);
             this.Controls.Add(this.panelRight);
             this.Controls.Add(this.panelBottom);
