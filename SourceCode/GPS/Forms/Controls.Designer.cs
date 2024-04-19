@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Windows.Forms;
 using AgOpenGPS.Forms;
 using AgOpenGPS.Forms.Pickers;
@@ -1240,6 +1241,305 @@ namespace AgOpenGPS
         {
             Close();
         }
+
+    private void checkPowerStatus()
+        {
+            if (isOnPower())
+            {
+                dontShutDown = false;
+            }
+            else
+            {
+                if (!dontShutDown)
+                {
+                    isShutingDown = true;
+                    btnCancelShutdown.Text = "Cancel ShutDown";
+                    btnCancelShutdown.Visible = true;
+                    btnCancelShutdown.Enabled = true;
+
+
+                }
+            }
+        }
+
+    private bool isOnPower()
+    {
+        try // this will fail if not a device with controllable brightness (eg, a desktop)
+        {
+            var mclass = new ManagementClass("BatteryStatus")
+            {
+                Scope = new ManagementScope(@"\\.\root\wmi")
+            };
+            var instances = mclass.GetInstances();
+            foreach (ManagementObject instance in instances)
+            {
+                return (bool)instance.GetPropertyValue("PowerOnLine");
+            }
+            return true;
+        }
+        catch
+        {
+            return true; // check this and disable the buttons if not available
+        }
+    }
+
+    private void doShutdownRoutine()
+        {
+            //the auto power off stuff -by Pat
+            if (isShutingDown)
+            {
+                //check if still unpowered
+                if (isOnPower())
+                {
+                    //power returned- chancel shutdown
+                    isShutingDown = false;
+                    dontShutDown = false;
+                    ShutingDownSec = 10;
+                    dontShutDownSec = 60;
+                    btnCancelShutdown.Enabled = false;
+                    btnCancelShutdown.Visible = false;
+                }
+                else
+                {
+                    ShutingDownSec -= 1;
+                }
+            }
+
+            if (dontShutDown)
+            {
+                dontShutDownSec -= 1;
+                if (dontShutDownSec < 1)
+                {
+                    dontShutDown = false;
+                    dontShutDownSec = 60;
+                }
+            }
+
+            if (ShutingDownSec < 4)
+            {
+                //sure it execute only once
+                //isShutingDown = false;
+                //ShutingDownSec = 5;
+                btnCancelShutdown.Text = "Closing Forms";
+
+                //shutdown!
+
+                //Close the form "first" if open
+                isTermsAccepted = true;
+
+                //Turn off auto section if on
+
+                //Close field if open
+                //this comme from FormGPS.cs line 543 private void FormGPS_FormClosing(object sender, FormClosingEventArgs e)
+                {
+                    //FormSteer
+                    Form f = Application.OpenForms["FormSteer"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormSteerWiz
+                    f = Application.OpenForms["FormSteerWiz"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormConfig
+                    f = Application.OpenForms["FormConfig"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FromBndTool
+                    f = Application.OpenForms["FromBndTool"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormBoundary
+                    f = Application.OpenForms["FormBoundary"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormFieldDir
+                    f = Application.OpenForms["FormFieldDir"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormFieldExisting
+                    f = Application.OpenForms["FormFieldExisting"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //formFieldISOXML
+                    f = Application.OpenForms["formFieldISOXML"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormFieldKML
+                    f = Application.OpenForms["FormFieldKML"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormJob
+                    f = Application.OpenForms["FormJob"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+                    //FormSaveOrNot
+                    f = Application.OpenForms["FormSaveOrNot"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+
+                    f = Application.OpenForms["Form_First"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+
+                    f = Application.OpenForms["FormGPSData"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+
+                    f = Application.OpenForms["FormFieldData"];
+
+                    if (f != null)
+                    {
+                        f.Focus();
+                        f.Close();
+                    }
+
+                    f = Application.OpenForms["FormPan"];
+
+                    if (f != null)
+                    {
+                        isPanFormVisible = false;
+                        f.Focus();
+                        f.Close();
+                    }
+
+                    /*
+                    if (this.OwnedForms.Any())
+                    {
+                        TimedMessageBox(2000, gStr.gsWindowsStillOpen, gStr.gsCloseAllWindowsFirst);
+                        e.Cancel = true;
+                        return;
+                    }
+                    */
+                    if (isJobStarted)
+                    {
+                        if (autoBtnState == btnStates.Auto)
+                            btnSectionMasterAuto.PerformClick();
+
+                        if (manualBtnState == btnStates.On)
+                            btnSectionMasterManual.PerformClick();
+                        /*
+                        bool closing = true;
+                        int choice = SaveOrNot(closing);
+
+                        if (choice == 1)
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
+                        */
+                        //Save, return, cancel save
+
+                        if (isJobStarted)
+                        {
+                            /*
+                                if (choice == 3)
+                                {
+                                    e.Cancel = true;
+                                    return;
+                                }
+                                else if (choice == 0)
+                                    */
+                            {
+                                FileSaveEverythingBeforeClosingField();
+                            }
+                        }
+                    }
+
+                    SaveFormGPSWindowSettings();
+                    FileUpdateAllFieldsKML();
+                    /* dont do this loopBack stuff - Pat
+                    if (loopBackSocket != null)
+                    {
+                        try
+                        {
+                            loopBackSocket.Shutdown(SocketShutdown.Both);
+                        }
+                        catch { }
+                        finally { loopBackSocket.Close(); }
+                    }
+                    */
+                    //save current vehicle
+                    SettingsIO.ExportAll(vehiclesDirectory + vehicleFileName + ".XML");
+
+                    if (displayBrightness.isWmiMonitor)
+                        displayBrightness.SetBrightness(Settings.Default.setDisplay_brightnessSystem);
+                }
+
+                if (ShutingDownSec < 1)
+                {
+                    ShutingDownSec = 10;
+                    isShutingDown = false;
+                    btnCancelShutdown.Text = "Shuting Down";
+                    //Shutdown down computer
+                    Process.Start("shutdown", "/s /t 0");
+                    //test: just close AOG
+                    //Close();
+                }
+            }
+        }
+
+    private void btnCancelShutdown_Click(object sender, EventArgs e)
+        {
+            isShutingDown = false;
+            dontShutDown = true;
+            dontShutDownSec = 60;
+            ShutingDownSec = 10;
+            btnCancelShutdown.Visible = false;
+            btnCancelShutdown.Enabled = false;
+        }
+
         private void btnMinimizeMainForm_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;

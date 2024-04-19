@@ -126,12 +126,13 @@ namespace AgOpenGPS
 
         private void FormConfig_FormClosing(object sender, FormClosingEventArgs e)
         {
+            /*
             if (!isClosing)
             {
                 e.Cancel = true;
                 return;
             }
-
+            */
             //reload all the settings from default and user.config
             mf.LoadSettings();
 

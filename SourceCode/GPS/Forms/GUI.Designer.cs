@@ -10,6 +10,8 @@ using System.IO;
 using System.Media;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
 
 namespace AgOpenGPS
 {
@@ -83,6 +85,10 @@ namespace AgOpenGPS
 
         public List<int> buttonOrder = new List<int>();
 
+        public bool isShutingDown = false; //timer to shut down after some seconds without sector power
+        public bool dontShutDown = true;  //timer to avoid shutdown after it was canceled by user -no shut down the first 60 sec if never powered
+        public int ShutingDownSec = 10;
+        public int dontShutDownSec = 60;
 
 
         //Timer triggers at 125 msec
@@ -91,7 +97,10 @@ namespace AgOpenGPS
             //Check for a newline char, if none then just return
             if (++sentenceCounter > 20)
             {
+                dontShutDown = false;
                 ShowNoGPSWarning();
+                checkPowerStatus();
+                doShutdownRoutine();
                 return;
             }
 
@@ -99,6 +108,8 @@ namespace AgOpenGPS
             //every 4 second update status
             if (fourSecondCounter >= 4)
             {
+                checkPowerStatus();            
+
                 if (!isPauseFieldTextCounter)
                 {
                     if (++currentFieldTextCounter > 4) currentFieldTextCounter = 0;
@@ -302,6 +313,10 @@ namespace AgOpenGPS
             //every second update all status ///////////////////////////   1 1 1 1 1 1 ////////////////////////////
             if (oneSecondCounter >= 4)
             {
+                doShutdownRoutine();
+                
+
+
                 //reset the counter
                 oneSecondCounter = 0;
 
