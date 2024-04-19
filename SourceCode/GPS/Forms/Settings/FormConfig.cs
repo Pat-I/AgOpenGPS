@@ -88,6 +88,7 @@ namespace AgOpenGPS
             nudGuidanceLookAhead.Controls[0].Enabled = false;
 
             nudDualHeadingOffset.Controls[0].Enabled = false;
+            nudDualReverseDistance.Controls[0].Enabled = false;
 
             nudMaxAngularVelocity.Controls[0].Enabled = false;
 
@@ -273,6 +274,7 @@ namespace AgOpenGPS
             chkDisplayPolygons.Checked = mf.isDrawPolygons;
             chkDisplayLightbar.Checked = mf.isLightbarOn;
             chkDisplayKeyboard.Checked = mf.isKeyboardOn;
+            chkDisplayLogElevation.Checked = mf.isLogElevation;
 
             if (mf.isMetric) rbtnDisplayMetric.Checked = true;
             else rbtnDisplayImperial.Checked = true;
@@ -303,6 +305,5 @@ namespace AgOpenGPS
             Close();
             //FormConfig_Load(this, e);
         }
-
     }
 }

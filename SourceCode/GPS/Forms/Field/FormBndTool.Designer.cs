@@ -48,6 +48,7 @@
             this.btnZoomOut = new System.Windows.Forms.Button();
             this.btnZoomIn = new System.Windows.Forms.Button();
             this.tlp1 = new System.Windows.Forms.TableLayoutPanel();
+            this.label2 = new System.Windows.Forms.Label();
             this.tlp1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -138,6 +139,7 @@
             this.cboxSmooth.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxSmooth.FormattingEnabled = true;
             this.cboxSmooth.Items.AddRange(new object[] {
+            "0",
             "4",
             "8",
             "16",
@@ -281,12 +283,12 @@
             // 
             this.btnResetReduce.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnResetReduce.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.btnResetReduce.BackgroundImage = global::AgOpenGPS.Properties.Resources.Play;
             this.btnResetReduce.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tlp1.SetColumnSpan(this.btnResetReduce, 3);
             this.btnResetReduce.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.btnResetReduce.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResetReduce.Font = new System.Drawing.Font("Tahoma", 14.25F);
+            this.btnResetReduce.Image = global::AgOpenGPS.Properties.Resources.SwitchOn;
             this.btnResetReduce.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnResetReduce.Location = new System.Drawing.Point(20, 20);
             this.btnResetReduce.Name = "btnResetReduce";
@@ -370,6 +372,7 @@
             // tlp1
             // 
             this.tlp1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.tlp1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.tlp1.ColumnCount = 6;
             this.tlp1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.7507F));
             this.tlp1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 19.4958F));
@@ -393,26 +396,43 @@
             this.tlp1.Controls.Add(this.cboxSmooth, 0, 4);
             this.tlp1.Controls.Add(this.btnExit, 4, 7);
             this.tlp1.Controls.Add(this.cboxIsZoom, 0, 5);
+            this.tlp1.Controls.Add(this.label2, 3, 3);
             this.tlp1.Location = new System.Drawing.Point(701, 0);
             this.tlp1.Name = "tlp1";
             this.tlp1.RowCount = 8;
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.57143F));
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4.428571F));
-            this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.42857F));
-            this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 3.857143F));
+            this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
+            this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4F));
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 13.85714F));
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.71428F));
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17.28572F));
             this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.71429F));
+            this.tlp1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tlp1.Size = new System.Drawing.Size(299, 700);
             this.tlp1.TabIndex = 572;
             // 
-            // FormMapBnd
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.label2.AutoSize = true;
+            this.tlp1.SetColumnSpan(this.label2, 3);
+            this.label2.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.Black;
+            this.label2.Location = new System.Drawing.Point(195, 242);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(64, 19);
+            this.label2.TabIndex = 572;
+            this.label2.Text = "Create";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // FormBndTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DarkGray;
-            this.ClientSize = new System.Drawing.Size(1006, 703);
+            this.BackColor = System.Drawing.Color.LightGray;
+            this.ClientSize = new System.Drawing.Size(1006, 726);
+            this.ControlBox = false;
             this.Controls.Add(this.tlp1);
             this.Controls.Add(this.oglSelf);
             this.ForeColor = System.Drawing.Color.Black;
@@ -420,10 +440,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(1022, 742);
-            this.Name = "FormMapBnd";
+            this.Name = "FormBndTool";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Draw AB - Click 2 points on the Boundary to Begin";
+            this.Text = "Create Boundary From Mapping";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormBndTool_FormClosing);
             this.Load += new System.EventHandler(this.FormBndTool_Load);
             this.ResizeEnd += new System.EventHandler(this.FormBndTool_ResizeEnd);
@@ -454,5 +474,6 @@
         private System.Windows.Forms.Button btnZoomOut;
         private System.Windows.Forms.Button btnZoomIn;
         private System.Windows.Forms.TableLayoutPanel tlp1;
+        private System.Windows.Forms.Label label2;
     }
 }
