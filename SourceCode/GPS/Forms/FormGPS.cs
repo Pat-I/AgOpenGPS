@@ -262,9 +262,15 @@ namespace AgOpenGPS
         public CWindowsSettingsBrightnessController displayBrightness;
 
         /// <summary>
+
+        /// The ISOBUS communication class
+        /// </summary>
+        public CISOBUS isobus;
+
         /// AgShare client for uploading fields
         /// </summary>
         private AgShareClient agShareClient;
+
 
 
         #endregion // Class Props and instances
@@ -394,6 +400,8 @@ namespace AgOpenGPS
 
             //brightness object class
             displayBrightness = new CWindowsSettingsBrightnessController(Properties.Settings.Default.setDisplay_isBrightnessOn);
+
+            isobus = new CISOBUS(this);
         }
 
         private void FormGPS_Load(object sender, EventArgs e)
@@ -727,6 +735,11 @@ namespace AgOpenGPS
                 f.Top = this.Height / 3 + this.Top;
                 f.Left = this.Width - 400 + this.Left;
             }
+        }
+
+        private void btnIsobusSC_Click(object sender, EventArgs e)
+        {
+            isobus.RequestSectionControlEnabled(!isobus.IsSectionControlEnabled());
         }
 
         private void FormGPS_Move(object sender, EventArgs e)
