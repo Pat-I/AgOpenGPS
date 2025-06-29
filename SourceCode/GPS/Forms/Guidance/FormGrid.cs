@@ -97,20 +97,6 @@ namespace AgOpenGPS
             btnExit.Focus();
         }
 
-        private void BtnMakeABLine_Click(object sender, EventArgs e)
-        {         
-
-            //calculate the Heading
-            double abHead = Math.Atan2(
-                pntB.easting - pntA.easting,
-                pntB.northing - pntA.northing);
-            if (abHead < 0) abHead += glm.twoPI;
-
-            //clean up gui
-
-            start = 99999; end = 99999;
-        }
-
         private void oglSelf_MouseDown(object sender, MouseEventArgs e)
         {
             Point pt = oglSelf.PointToClient(Cursor.Position);

@@ -1,4 +1,5 @@
-﻿using AgOpenGPS.Culture;
+﻿using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using System;
 using System.Windows.Forms;
@@ -19,8 +20,13 @@ namespace AgOpenGPS
             mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.Text = gStr.gsTramLines;
-            label3.Text = gStr.gsPasses;
+            this.Text = gStr.gsSimpleTramLines;
+            labelPasses.Text = gStr.gsPasses;
+            labelMode.Text = gStr.gsMode;
+            labelAlpha.Text = gStr.gsAlpha; 
+            labelSeed.Text = gStr.gsWorkWidth;
+            labelSprayWidth.Text = gStr.gsTramWidth;
+            labelTrack.Text = gStr.gsTrack;
             lblTramWidth.Text = (mf.tram.tramWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
             lblSeedWidth.Text = (mf.tool.width * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
 
@@ -42,7 +48,7 @@ namespace AgOpenGPS
             nudPasses.Value = Properties.Settings.Default.setTram_passes;
             nudPasses.ValueChanged += nudPasses_ValueChanged;
 
-            lblTrack.Text = (mf.vehicle.trackWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
+            lblTrack.Text = (mf.vehicle.VehicleConfig.TrackWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
 
             mf.tool.halfWidth = (mf.tool.width - mf.tool.overlap) / 2.0;
 
@@ -154,7 +160,7 @@ namespace AgOpenGPS
 
         private void nudPasses_Click(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NudlessNumericUpDown)sender, this);
+            ((NudlessNumericUpDown)sender).ShowKeypad(this);
         }
         private void btnUpTrams_Click(object sender, EventArgs e)
         {

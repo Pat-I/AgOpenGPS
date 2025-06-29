@@ -20,7 +20,7 @@ namespace AgOpenGPS
 
         public int idx, autoTrack3SecTimer;
 
-        public bool isLine, isAutoTrack = false, isAutoSnapToPivot = false, isAutoSnapped;
+        public bool isAutoTrack = false, isAutoSnapToPivot = false, isAutoSnapped;
 
         public CTrack(FormGPS _f)
         {
@@ -318,6 +318,7 @@ namespace AgOpenGPS
         public vec2 endPtB;
         public TrackMode mode;
         public double nudgeDistance;
+        public HashSet<int> workedTracks = new HashSet<int>();
 
         public CTrk()
         {

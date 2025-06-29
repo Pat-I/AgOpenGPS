@@ -1,7 +1,8 @@
 ﻿//Please, if you use this, share the improvements
 
 using AgLibrary.Logging;
-using AgOpenGPS.Culture;
+using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using Microsoft.Win32;
 using System;
@@ -106,19 +107,13 @@ namespace AgOpenGPS
             //metric or imp on spinners min/maxes
             if (!mf.isMetric) FixMinMaxSpinners();
 
-            //the pick a saved vehicle box
-            UpdateVehicleListView();
-
             //tabTSections_Enter(this, e);
             lblVehicleToolWidth.Text = Convert.ToString((int)(mf.tool.width * 100 * mf.cm2CmOrIn));
             SectionFeetInchesTotalWidthLabelUpdate();
 
             tab1.SelectedTab = tabSummary;
-            tboxVehicleNameSave.Focus();
             //Label translations
             //configload-save
-            labelSaveAs.Text = gStr.gsSaveAs;
-            labelNew.Text = gStr.gsNew;
             labelUnits.Text = gStr.gsUnit;
             labelWidth.Text = gStr.gsWidth;
             labelSections.Text = gStr.gsSections;
@@ -129,8 +124,6 @@ namespace AgOpenGPS
             labelTramW.Text = gStr.gsTramWidth;
             labelUnitsBottom.Text = gStr.gsUnit;
             labelToolWidthBottom.Text = gStr.gsWidth;
-            labelOpen.Text = gStr.gsOpen;
-            labelDelete.Text = gStr.gsDelete;
             //tractorconfig
             labelWheelBase.Text = gStr.gsWheelbase;
             labelVehicleGroupBox.Text = gStr.gsVehiclegroupbox;
@@ -265,16 +258,8 @@ namespace AgOpenGPS
             labelSectionLinesOnOff.Text = gStr.gsSectionLines;
             labelElevationOnOff.Text = gStr.gsElevationlog;
             unitsGroupBox.Text = gStr.gsUnits;
-
-
-
-
-
-
-
-
-
-
+            cboxIsAutoSwitchDualFixOn.Text = gStr.gsAutoSwitchDualFix;
+            labelAutoSwitchDualFixSpeed.Text = gStr.gsAutoSwitchDualFixSpeed;
 
             UpdateSummary();
 
@@ -293,11 +278,11 @@ namespace AgOpenGPS
                 return;
             }
 
-            //reload all the settings from default and user.config
+            //reload all the settings
             mf.LoadSettings();
 
             //save current vehicle
-            RegistrySettings.Save();
+            Properties.Settings.Default.Save();
         }
 
         private void FixMinMaxSpinners()
@@ -395,22 +380,6 @@ namespace AgOpenGPS
         {
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (lvVehicles.SelectedItems.Count > 0)
-            {
-                //btnVehicleSaveAs.Enabled = true;
-                btnVehicleLoad.Enabled = true;
-                btnVehicleDelete.Enabled = true;
-            }
-            else
-            {
-                //btnVehicleSaveAs.Enabled = false;
-                btnVehicleLoad.Enabled = false;
-                btnVehicleDelete.Enabled = false;
-            }
-        }
-
         private void tabDisplay_Enter(object sender, EventArgs e)
         {
             chkDisplayBrightness.Checked = mf.isBrightnessOn;
@@ -445,7 +414,6 @@ namespace AgOpenGPS
 
             mf.isMetric = false;
             Properties.Settings.Default.setMenu_isMetric = mf.isMetric;
-            Properties.Settings.Default.Save();
             isClosing = true;
             Close();
         }
@@ -457,7 +425,6 @@ namespace AgOpenGPS
 
             mf.isMetric = true;
             Properties.Settings.Default.setMenu_isMetric = mf.isMetric;
-            Properties.Settings.Default.Save();
             isClosing = true;
             Close();
             //FormConfig_Load(this, e);
@@ -465,11 +432,12 @@ namespace AgOpenGPS
 
         private void nudNumGuideLines_Click(object sender, EventArgs e)
         {
-            if (mf.KeypadToNUD((NudlessNumericUpDown)sender, this))
+            if (((NudlessNumericUpDown)sender).ShowKeypad(this))
             {
                 mf.ABLine.numGuideLines = (int)nudNumGuideLines.Value;
             }
 
         }
+
     }
 }

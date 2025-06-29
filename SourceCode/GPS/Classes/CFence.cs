@@ -13,10 +13,6 @@ namespace AgOpenGPS
 
         public bool isDrawRightSide = true, isDrawAtPivot = true, isOkToAddPoints = false;
         public bool isRecBoundaryWhenSectionOn = false;
-        public int closestFenceNum;
-
-        //point at the farthest boundary segment from pivotAxle
-        public vec3 closestFencePt = new vec3(-10000, -10000, 9);
 
         public bool IsPointInsideFenceArea(vec3 testPoint)
         {

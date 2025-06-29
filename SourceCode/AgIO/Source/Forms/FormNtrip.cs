@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using AgIO.Controls;
 using AgLibrary.Logging;
 
 namespace AgIO
@@ -116,9 +117,7 @@ namespace AgIO
             mf.YesMessageBox("Restart of AgIO is Required - Restarting");
             Log.EventWriter("Program Reset: Selecting NTRIP Feature");
 
-            RegistrySettings.Save();
-            Application.Restart();
-            Environment.Exit(0);
+            Program.Restart();
         }
 
         //get the ipv4 address only
@@ -265,9 +264,7 @@ namespace AgIO
             {
                 Log.EventWriter("Program Reset: Button Ok on Ntrip Form");
                 
-                RegistrySettings.Save();
-                Application.Restart();
-                Environment.Exit(0);
+                Program.Restart();
             }
         }
 
@@ -374,31 +371,31 @@ namespace AgIO
 
         private void NudCasterPort_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            ((NumericUpDown)sender).ShowKeypad(this);
             btnSerialCancel.Focus();
         }
 
         private void NudGGAInterval_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            ((NumericUpDown)sender).ShowKeypad(this);
             btnSerialCancel.Focus();
         }
 
         private void NudLatitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            ((NumericUpDown)sender).ShowKeypad(this);
             btnSerialCancel.Focus();
         }
 
         private void NudLongitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            ((NumericUpDown)sender).ShowKeypad(this);
             btnSerialCancel.Focus();
         }
 
         private void NudSendToUDPPort_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            ((NumericUpDown)sender).ShowKeypad(this);
             btnSerialCancel.Focus();
         }
 
@@ -406,7 +403,7 @@ namespace AgIO
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender, this);
+                ((TextBox)sender).ShowKeyboard(this);
                 btnSerialCancel.Focus();
             }
             btnGetIP.PerformClick();
@@ -416,7 +413,7 @@ namespace AgIO
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender, this);
+                ((TextBox)sender).ShowKeyboard(this);
                 btnSerialCancel.Focus();
             }
         }
@@ -425,7 +422,7 @@ namespace AgIO
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender, this);
+                ((TextBox)sender).ShowKeyboard(this);
                 btnSerialCancel.Focus();
             }
         }
@@ -434,7 +431,7 @@ namespace AgIO
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender, this);
+                ((TextBox)sender).ShowKeyboard(this);
                 btnSerialCancel.Focus();
             }
         }

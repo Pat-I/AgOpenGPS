@@ -31,7 +31,8 @@ namespace AgOpenGPS
             label4.Text = Properties.Settings.Default.setVehicle_maxSteerAngle.ToString();
             label6.Text = Properties.Settings.Default.setAS_countsPerDegree.ToString();
             label8.Text = Properties.Settings.Default.setAS_ackerman.ToString();
-            label10.Text = Properties.Settings.Default.setAS_wasOffset.ToString();
+            label10.Text = (Properties.Settings.Default.setAS_wasOffset / (double)(Properties.Settings.Default.setAS_countsPerDegree)).ToString("N2");
+
             label12.Text = Properties.Settings.Default.setAS_highSteerPWM.ToString();
             label14.Text = Properties.Settings.Default.setAS_lowSteerPWM.ToString();
             label16.Text = Properties.Settings.Default.setAS_minSteerPWM.ToString();
@@ -93,9 +94,9 @@ namespace AgOpenGPS
             label126.Text = Properties.Settings.Default.setTool_trailingToolToPivotLength.ToString();
             label128.Text = Properties.Settings.Default.setVehicle_hitchLength.ToString();
             label130.Text = Properties.Settings.Default.setVehicle_hydraulicLiftLookAhead.ToString();
-            label132.Text = Properties.Settings.Default.setVehicle_isPivotBehindAntenna.ToString();
+            label132.Text = "*****";
             label134.Text = Properties.Settings.Default.setVehicle_isStanleyUsed.ToString();
-            label136.Text = Properties.Settings.Default.setVehicle_isSteerAxleAhead.ToString();
+            label136.Text = "*****";
             label138.Text = Properties.Settings.Default.setVehicle_maxAngularVelocity.ToString();
             label140.Text = Properties.Settings.Default.set_youTurnRadius.ToString();
             label142.Text = Properties.Settings.Default.setVehicle_numSections.ToString();

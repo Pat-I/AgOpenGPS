@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTramLine));
             this.oglSelf = new OpenTK.GLControl();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.lblCurveSelected = new System.Windows.Forms.Label();
@@ -37,7 +36,7 @@
             this.btnDnAlpha = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.labelAlpha = new System.Windows.Forms.Label();
             this.cboxIsOuter = new System.Windows.Forms.CheckBox();
             this.btnDeleteAllTrams = new System.Windows.Forms.Button();
             this.btnCancelTouch = new System.Windows.Forms.Button();
@@ -47,13 +46,13 @@
             this.btnSelectCurveBk = new System.Windows.Forms.Button();
             this.btnSelectCurve = new System.Windows.Forms.Button();
             this.btnAddLines = new System.Windows.Forms.Button();
-            this.btnResize = new System.Windows.Forms.Button();
             this.lblAplha = new System.Windows.Forms.Label();
             this.btnUpAlpha = new System.Windows.Forms.Button();
             this.btnDnTrams = new System.Windows.Forms.Button();
             this.btnDnStartTram = new System.Windows.Forms.Button();
             this.btnUpStartTram = new System.Windows.Forms.Button();
             this.btnUpTrams = new System.Windows.Forms.Button();
+            this.btnResize = new System.Windows.Forms.Button();
             this.tlp1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -103,13 +102,12 @@
             this.tlp1.Controls.Add(this.btnDnAlpha, 0, 0);
             this.tlp1.Controls.Add(this.btnCancel, 0, 8);
             this.tlp1.Controls.Add(this.btnSave, 2, 8);
-            this.tlp1.Controls.Add(this.label2, 1, 0);
+            this.tlp1.Controls.Add(this.labelAlpha, 1, 0);
             this.tlp1.Controls.Add(this.cboxIsOuter, 2, 3);
             this.tlp1.Controls.Add(this.btnDeleteAllTrams, 1, 2);
             this.tlp1.Controls.Add(this.btnCancelTouch, 0, 3);
             this.tlp1.Controls.Add(this.btnSwapAB, 0, 2);
             this.tlp1.Controls.Add(this.lblNumPasses, 1, 6);
-            this.tlp1.Controls.Add(this.lblStartPass, 1, 5);
             this.tlp1.Controls.Add(this.btnSelectCurveBk, 0, 4);
             this.tlp1.Controls.Add(this.lblCurveSelected, 1, 4);
             this.tlp1.Controls.Add(this.btnSelectCurve, 2, 4);
@@ -121,6 +119,7 @@
             this.tlp1.Controls.Add(this.btnUpStartTram, 2, 5);
             this.tlp1.Controls.Add(this.btnUpTrams, 2, 6);
             this.tlp1.Controls.Add(this.btnResize, 2, 2);
+            this.tlp1.Controls.Add(this.lblStartPass, 1, 5);
             this.tlp1.Location = new System.Drawing.Point(703, 0);
             this.tlp1.Name = "tlp1";
             this.tlp1.RowCount = 9;
@@ -146,7 +145,7 @@
             this.btnDnAlpha.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDnAlpha.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDnAlpha.ForeColor = System.Drawing.Color.White;
-            this.btnDnAlpha.Image = ((System.Drawing.Image)(resources.GetObject("btnDnAlpha.Image")));
+            this.btnDnAlpha.Image = global::AgOpenGPS.Properties.Resources.IncrementMinus;
             this.btnDnAlpha.Location = new System.Drawing.Point(13, 5);
             this.btnDnAlpha.Name = "btnDnAlpha";
             this.tlp1.SetRowSpan(this.btnDnAlpha, 2);
@@ -191,19 +190,19 @@
             this.btnSave.UseVisualStyleBackColor = false;
             this.btnSave.Click += new System.EventHandler(this.btnExit_Click);
             // 
-            // label2
+            // labelAlpha
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.label2.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Black;
-            this.label2.Location = new System.Drawing.Point(119, 2);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(57, 23);
-            this.label2.TabIndex = 571;
-            this.label2.Text = "Alpha";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labelAlpha.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.labelAlpha.AutoSize = true;
+            this.labelAlpha.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.labelAlpha.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAlpha.ForeColor = System.Drawing.Color.Black;
+            this.labelAlpha.Location = new System.Drawing.Point(119, 2);
+            this.labelAlpha.Name = "labelAlpha";
+            this.labelAlpha.Size = new System.Drawing.Size(57, 23);
+            this.labelAlpha.TabIndex = 571;
+            this.labelAlpha.Text = "Alpha";
+            this.labelAlpha.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // cboxIsOuter
             // 
@@ -293,15 +292,17 @@
             // 
             // lblStartPass
             // 
-            this.lblStartPass.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lblStartPass.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblStartPass.BackColor = System.Drawing.Color.WhiteSmoke;
             this.lblStartPass.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStartPass.ForeColor = System.Drawing.Color.Black;
-            this.lblStartPass.Location = new System.Drawing.Point(102, 356);
+            this.lblStartPass.Location = new System.Drawing.Point(102, 344);
             this.lblStartPass.Name = "lblStartPass";
-            this.lblStartPass.Size = new System.Drawing.Size(92, 68);
+            this.lblStartPass.Size = new System.Drawing.Size(92, 92);
             this.lblStartPass.TabIndex = 580;
-            this.lblStartPass.Text = "Start\r\n12";
+            this.lblStartPass.Text = "Start\r\n 12";
             this.lblStartPass.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnSelectCurveBk
@@ -357,22 +358,6 @@
             this.btnAddLines.UseVisualStyleBackColor = false;
             this.btnAddLines.Click += new System.EventHandler(this.btnAddLines_Click);
             // 
-            // btnResize
-            // 
-            this.btnResize.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnResize.BackColor = System.Drawing.Color.Transparent;
-            this.btnResize.FlatAppearance.BorderSize = 0;
-            this.btnResize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnResize.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnResize.ForeColor = System.Drawing.Color.White;
-            this.btnResize.Image = global::AgOpenGPS.Properties.Resources.ConD_FullScreenBegin;
-            this.btnResize.Location = new System.Drawing.Point(212, 88);
-            this.btnResize.Name = "btnResize";
-            this.btnResize.Size = new System.Drawing.Size(72, 62);
-            this.btnResize.TabIndex = 582;
-            this.btnResize.UseVisualStyleBackColor = false;
-            this.btnResize.Click += new System.EventHandler(this.btnResize_Click);
-            // 
             // lblAplha
             // 
             this.lblAplha.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -395,7 +380,7 @@
             this.btnUpAlpha.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpAlpha.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpAlpha.ForeColor = System.Drawing.Color.White;
-            this.btnUpAlpha.Image = ((System.Drawing.Image)(resources.GetObject("btnUpAlpha.Image")));
+            this.btnUpAlpha.Image = global::AgOpenGPS.Properties.Resources.IncrementPlus;
             this.btnUpAlpha.Location = new System.Drawing.Point(212, 5);
             this.btnUpAlpha.Name = "btnUpAlpha";
             this.tlp1.SetRowSpan(this.btnUpAlpha, 2);
@@ -412,7 +397,7 @@
             this.btnDnTrams.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDnTrams.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDnTrams.ForeColor = System.Drawing.Color.White;
-            this.btnDnTrams.Image = ((System.Drawing.Image)(resources.GetObject("btnDnTrams.Image")));
+            this.btnDnTrams.Image = global::AgOpenGPS.Properties.Resources.IncrementMinus;
             this.btnDnTrams.Location = new System.Drawing.Point(13, 458);
             this.btnDnTrams.Name = "btnDnTrams";
             this.btnDnTrams.Size = new System.Drawing.Size(72, 62);
@@ -428,7 +413,7 @@
             this.btnDnStartTram.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDnStartTram.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDnStartTram.ForeColor = System.Drawing.Color.White;
-            this.btnDnStartTram.Image = ((System.Drawing.Image)(resources.GetObject("btnDnStartTram.Image")));
+            this.btnDnStartTram.Image = global::AgOpenGPS.Properties.Resources.IncrementMinus;
             this.btnDnStartTram.Location = new System.Drawing.Point(13, 359);
             this.btnDnStartTram.Name = "btnDnStartTram";
             this.btnDnStartTram.Size = new System.Drawing.Size(72, 62);
@@ -444,7 +429,7 @@
             this.btnUpStartTram.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpStartTram.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpStartTram.ForeColor = System.Drawing.Color.White;
-            this.btnUpStartTram.Image = ((System.Drawing.Image)(resources.GetObject("btnUpStartTram.Image")));
+            this.btnUpStartTram.Image = global::AgOpenGPS.Properties.Resources.IncrementPlus;
             this.btnUpStartTram.Location = new System.Drawing.Point(212, 359);
             this.btnUpStartTram.Name = "btnUpStartTram";
             this.btnUpStartTram.Size = new System.Drawing.Size(72, 62);
@@ -460,13 +445,29 @@
             this.btnUpTrams.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpTrams.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpTrams.ForeColor = System.Drawing.Color.White;
-            this.btnUpTrams.Image = ((System.Drawing.Image)(resources.GetObject("btnUpTrams.Image")));
+            this.btnUpTrams.Image = global::AgOpenGPS.Properties.Resources.IncrementPlus;
             this.btnUpTrams.Location = new System.Drawing.Point(212, 458);
             this.btnUpTrams.Name = "btnUpTrams";
             this.btnUpTrams.Size = new System.Drawing.Size(72, 62);
             this.btnUpTrams.TabIndex = 566;
             this.btnUpTrams.UseVisualStyleBackColor = false;
             this.btnUpTrams.Click += new System.EventHandler(this.btnUpTrams_Click);
+            // 
+            // btnResize
+            // 
+            this.btnResize.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnResize.BackColor = System.Drawing.Color.Transparent;
+            this.btnResize.FlatAppearance.BorderSize = 0;
+            this.btnResize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResize.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResize.ForeColor = System.Drawing.Color.White;
+            this.btnResize.Image = global::AgOpenGPS.Properties.Resources.ConD_FullScreenBegin;
+            this.btnResize.Location = new System.Drawing.Point(212, 88);
+            this.btnResize.Name = "btnResize";
+            this.btnResize.Size = new System.Drawing.Size(72, 62);
+            this.btnResize.TabIndex = 582;
+            this.btnResize.UseVisualStyleBackColor = false;
+            this.btnResize.Click += new System.EventHandler(this.btnResize_Click);
             // 
             // FormTramLine
             // 
@@ -509,7 +510,7 @@
         private System.Windows.Forms.Button btnUpTrams;
         private System.Windows.Forms.Button btnSwapAB;
         private System.Windows.Forms.Label lblAplha;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labelAlpha;
         private System.Windows.Forms.Button btnAddLines;
         private System.Windows.Forms.Button btnCancelTouch;
         private System.Windows.Forms.Button btnUpStartTram;

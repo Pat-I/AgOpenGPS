@@ -1,4 +1,4 @@
-﻿using AgOpenGPS.Culture;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -34,7 +34,6 @@ namespace AgOpenGPS
         public List<vec3> secList = new List<vec3>();
         public List<vec3> bndList = new List<vec3>();
         public List<vec3> smooList = new List<vec3>();
-        public List<vec3> tempList = new List<vec3>();
 
         private double minDistSq = 1, minDistDisp = 1;
 
@@ -70,6 +69,15 @@ namespace AgOpenGPS
         private void FormBndTool_Load(object sender, EventArgs e)
         {
             panel1.Visible = false;
+            //translate
+            labelCreate.Text = gStr.gsCreate;
+            labelSmooth.Text = gStr.gsSmooth;   
+            labelPleaseWait.Text = gStr.gsPleaseWait;
+            labelReducedPoints.Text = gStr.gsReducedPoints;
+            labelSpacing.Text = gStr.gsSpacing;
+            labelPoints.Text = gStr.gsPoints;
+            labelPointsToProcess.Text = gStr.gsPointsToProcess;
+
 
             //already have a boundary
             if (mf.bnd.bndList.Count == 0)
@@ -457,7 +465,7 @@ namespace AgOpenGPS
                 }
             }
 
-            lblReducedPoints.Text = secList.Count.ToString();
+            labelReducedPoints.Text = secList.Count.ToString();
 
             rA = rB = rC = rD = rE = rF = rG = firstPoint = currentPoint = 0;
             bndList?.Clear();
@@ -635,7 +643,7 @@ namespace AgOpenGPS
                 if (item.heading == 2) secList.Add(new vec3(item.easting, item.northing, 0));
             }
 
-            lblReducedPoints.Text = secList.Count.ToString();
+            labelReducedPoints.Text = secList.Count.ToString();
 
             //Find most South point
             double minny = double.MaxValue;
@@ -848,7 +856,7 @@ namespace AgOpenGPS
             int limit = end;
             if (end == 99999 || start == 99999) return;
 
-            if (mf.bnd.bndList[bndSelect].fenceLine.Count > 0)
+            if (bndSelect >= 0 && bndSelect < mf.bnd.bndList.Count && mf.bnd.bndList[bndSelect].fenceLine.Count > 0)
             {
                 if ((Math.Abs(start - end)) > (mf.bnd.bndList[bndSelect].fenceLine.Count * 0.5))
                 {
@@ -889,8 +897,8 @@ namespace AgOpenGPS
                     }
                 }
 
-                arr[start] = new vec3(pint);
-
+                if (isC)
+                    arr[start] = new vec3(pint);
 
                 mf.bnd.bndList[bndSelect].fenceLine.Clear();
 

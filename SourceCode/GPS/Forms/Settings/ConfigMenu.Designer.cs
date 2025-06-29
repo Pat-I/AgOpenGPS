@@ -1,4 +1,4 @@
-﻿using AgOpenGPS.Culture;
+﻿using AgOpenGPS.Core.Translations;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -178,7 +178,6 @@ namespace AgOpenGPS
             ShowSubMenu(panelVehicleSubMenu, btnVehicle);
             btnSubVehicleType.BackColor = SystemColors.GradientActiveCaption;
             UpdateSummary();
-            UpdateVehicleListView();
         }
 
         private void ClearVehicleSubBackgrounds()
@@ -223,7 +222,6 @@ namespace AgOpenGPS
         {
             ShowSubMenu(panelToolSubMenu, btnTool);
             btnSubToolType.BackColor=SystemColors.GradientActiveCaption;
-            UpdateVehicleListView();
         }
 
         private void ClearToolSubBackgrounds()
@@ -299,7 +297,6 @@ namespace AgOpenGPS
         {
             ShowSubMenu(panelDataSourcesSubMenu, btnDataSources);
             btnSubHeading.BackColor=SystemColors.GradientActiveCaption;
-            UpdateVehicleListView();
         }
 
         private void btnSubHeading_Click(object sender, EventArgs e)
@@ -329,7 +326,6 @@ namespace AgOpenGPS
         {
             ShowSubMenu(panelArduinoSubMenu, btnArduino);
             btnMachineModule.BackColor = SystemColors.GradientActiveCaption;
-            UpdateVehicleListView();
         }
 
         private void btnMachineModule_Click(object sender, EventArgs e)

@@ -34,7 +34,7 @@
             this.btnLoadKML = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnSerialCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelFieldname = new System.Windows.Forms.Label();
             this.btnAddDate = new System.Windows.Forms.Button();
             this.btnAddTime = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -81,7 +81,6 @@
             // 
             this.btnLoadKML.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLoadKML.BackColor = System.Drawing.Color.Transparent;
-            this.btnLoadKML.Enabled = false;
             this.btnLoadKML.FlatAppearance.BorderColor = System.Drawing.Color.Silver;
             this.btnLoadKML.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLoadKML.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -130,18 +129,18 @@
             this.btnSerialCancel.UseVisualStyleBackColor = false;
             this.btnSerialCancel.Click += new System.EventHandler(this.btnSerialCancel_Click);
             // 
-            // label1
+            // labelFieldname
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label1.Location = new System.Drawing.Point(18, 11);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(174, 23);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Enter Field Name";
+            this.labelFieldname.AutoSize = true;
+            this.labelFieldname.BackColor = System.Drawing.Color.Transparent;
+            this.labelFieldname.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFieldname.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.labelFieldname.Location = new System.Drawing.Point(18, 11);
+            this.labelFieldname.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelFieldname.Name = "labelFieldname";
+            this.labelFieldname.Size = new System.Drawing.Size(174, 23);
+            this.labelFieldname.TabIndex = 4;
+            this.labelFieldname.Text = "Enter Field Name";
             // 
             // btnAddDate
             // 
@@ -185,7 +184,7 @@
             this.Controls.Add(this.btnAddDate);
             this.Controls.Add(this.btnAddTime);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelFieldname);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tboxFieldName);
             this.Controls.Add(this.btnLoadKML);
@@ -211,7 +210,7 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelFieldname;
         private System.Windows.Forms.Button btnLoadKML;
         private System.Windows.Forms.Button btnAddDate;
         private System.Windows.Forms.Button btnAddTime;

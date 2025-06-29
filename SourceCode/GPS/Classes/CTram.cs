@@ -8,9 +8,6 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        //the list of constants and multiples of the boundary
-        public List<vec2> calcList = new List<vec2>();
-
         //the triangle strip of the outer tram highlight
         public List<vec2> tramBndOuterArr = new List<vec2>();
 

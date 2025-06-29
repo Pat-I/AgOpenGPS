@@ -1,4 +1,4 @@
-﻿using AgOpenGPS.Culture;
+﻿using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -50,7 +50,8 @@ namespace AgOpenGPS
 
         private void FormTramLine_Load(object sender, EventArgs e)
         {
-            //trams
+            //translate all the controls
+            this.Text = gStr.gsAdvancedTramLines;
             lblAplha.Text = ((int)(mf.tram.alpha * 100)).ToString();
 
             mf.tool.halfWidth = (mf.tool.width - mf.tool.overlap) / 2.0;
@@ -191,7 +192,7 @@ namespace AgOpenGPS
             }
 
             passes = 2;
-            lblStartPass.Text = "Start\r\n" + startPass.ToString();
+            lblStartPass.Text = gStr.gsStart + ":\r\n" + startPass.ToString();
             lblNumPasses.Text = passes.ToString();
         }
 
@@ -822,7 +823,11 @@ namespace AgOpenGPS
             }
 
             ResetStartNumLabels();
+            FixLabelsCurve();
+            lblStartPass.Text = "Start\r\n" + startPass.ToString();
+            lblNumPasses.Text = passes.ToString();
             BuildTram();
+
         }
 
         private void btnSelectCurveBk_Click(object sender, EventArgs e)
@@ -893,7 +898,7 @@ namespace AgOpenGPS
         private void FixLabelsCurve()
         {
             this.Text = gStr.gsTramLines;
-            this.Text += "    Track: " + (mf.vehicle.trackWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
+            this.Text += "    Track: " + (mf.vehicle.VehicleConfig.TrackWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
             this.Text += "    Tram: " + (mf.tram.tramWidth * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
             this.Text += "    Seed: " + (mf.tool.width * mf.m2FtOrM).ToString("N2") + mf.unitsFtM;
 

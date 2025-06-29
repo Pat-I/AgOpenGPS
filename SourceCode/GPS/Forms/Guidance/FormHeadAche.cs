@@ -1,4 +1,6 @@
 ﻿using AgLibrary.Logging;
+using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -69,6 +71,11 @@ namespace AgOpenGPS
                 Top = 0;
                 Left = 0;
             }
+            //translate
+            this.Text = gStr.gsHeadlandForm;
+            btnBndLoop.Text = gStr.gsBuild;
+            btnDeleteHeadland.Text = gStr.gsReset;
+
         }
 
         private void FormHeadLine_FormClosing(object sender, FormClosingEventArgs e)
@@ -695,7 +702,7 @@ namespace AgOpenGPS
 
         private void nudSetDistance_Click(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NudlessNumericUpDown)sender, this);
+            ((NudlessNumericUpDown)sender).ShowKeypad(this);
             btnExit.Focus();
         }
 
@@ -859,12 +866,6 @@ namespace AgOpenGPS
             }
 
             mf.FileSaveHeadland();
-        }
-
-        private void btnDeletePoints_Click(object sender, EventArgs e)
-        {
-            start = 99999; end = 99999;
-            isA = true;
         }
 
         private void cboxToolWidths_SelectedIndexChanged(object sender, EventArgs e)

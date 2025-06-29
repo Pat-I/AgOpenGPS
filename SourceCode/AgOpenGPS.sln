@@ -20,6 +20,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keypad", "Keypad\Keypad.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgLibrary", "AgLibrary\AgLibrary.csproj", "{692B4970-37F1-4F02-8F7F-A514283FC399}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgLibrary.Tests", "AgLibrary.Tests\AgLibrary.Tests.csproj", "{69DD4FB4-9119-4ABA-A7E4-5B789C49DC6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgOpenGPS.Core", "AgOpenGPS.Core\AgOpenGPS.Core.csproj", "{F2486554-D063-4CB0-8220-52883AFEF238}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgOpenGPS.Core.Tests", "AgOpenGPS.Core.Tests\AgOpenGPS.Core.Tests.csproj", "{C11215F6-2903-4CE6-BEA2-B70F831770D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgOpenGPS.WpfApp", "AgOpenGPS.WpfApp\AgOpenGPS.WpfApp.csproj", "{CCBC7CE7-6A6A-47F7-9781-36A864FDCBD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgOpenGPS.WpfViews", "AgOpenGPS.WpfViews\AgOpenGPS.WpfViews.csproj", "{03B426E1-59BD-4E72-9528-DE37429E21C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgDiag", "AgDiag\AgDiag.csproj", "{8AE86C22-D6EA-46D3-A053-C10B15EDEC8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +62,30 @@ Global
 		{692B4970-37F1-4F02-8F7F-A514283FC399}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{692B4970-37F1-4F02-8F7F-A514283FC399}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{692B4970-37F1-4F02-8F7F-A514283FC399}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DD4FB4-9119-4ABA-A7E4-5B789C49DC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DD4FB4-9119-4ABA-A7E4-5B789C49DC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DD4FB4-9119-4ABA-A7E4-5B789C49DC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DD4FB4-9119-4ABA-A7E4-5B789C49DC6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2486554-D063-4CB0-8220-52883AFEF238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2486554-D063-4CB0-8220-52883AFEF238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2486554-D063-4CB0-8220-52883AFEF238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2486554-D063-4CB0-8220-52883AFEF238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C11215F6-2903-4CE6-BEA2-B70F831770D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C11215F6-2903-4CE6-BEA2-B70F831770D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C11215F6-2903-4CE6-BEA2-B70F831770D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C11215F6-2903-4CE6-BEA2-B70F831770D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCBC7CE7-6A6A-47F7-9781-36A864FDCBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCBC7CE7-6A6A-47F7-9781-36A864FDCBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCBC7CE7-6A6A-47F7-9781-36A864FDCBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCBC7CE7-6A6A-47F7-9781-36A864FDCBD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03B426E1-59BD-4E72-9528-DE37429E21C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03B426E1-59BD-4E72-9528-DE37429E21C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03B426E1-59BD-4E72-9528-DE37429E21C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03B426E1-59BD-4E72-9528-DE37429E21C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AE86C22-D6EA-46D3-A053-C10B15EDEC8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AE86C22-D6EA-46D3-A053-C10B15EDEC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AE86C22-D6EA-46D3-A053-C10B15EDEC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AE86C22-D6EA-46D3-A053-C10B15EDEC8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

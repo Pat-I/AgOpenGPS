@@ -1,4 +1,6 @@
 ﻿using AgLibrary.Logging;
+using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -53,7 +55,7 @@ namespace AgOpenGPS
             sliceArr?.Clear();
             backupList?.Clear();
 
-            btnSlice.Enabled = false;
+            btnClipLine.Enabled = false;
 
             if (mf.bnd.bndList[0].hdLine.Count == 0)
             {
@@ -78,7 +80,7 @@ namespace AgOpenGPS
             if (cboxIsSectionControlled.Checked) cboxIsSectionControlled.Image = Properties.Resources.HeadlandSectionOn;
             else cboxIsSectionControlled.Image = Properties.Resources.HeadlandSectionOff;
 
-            cboxIsZoom.Checked = false;
+            checkBoxZoomIn.Checked = false;
 
             Size = Properties.Settings.Default.setWindow_HeadlineSize;
 
@@ -94,6 +96,12 @@ namespace AgOpenGPS
                 Top = 0;
                 Left = 0;
             }
+            //translate
+            this.Text = gStr.gsHeadlandForm;
+            btnBndLoop.Text = gStr.gsBuildAround;
+            btnDeletePoints.Text = gStr.gsReset;
+            btnClipLine.Text = gStr.gsClipLine;
+            checkBoxZoomIn.Text = gStr.gsZoomIn;
         }
 
         private void FormHeadLine_ResizeEnd(object sender, EventArgs e)
@@ -157,7 +165,7 @@ namespace AgOpenGPS
             int halfWid = oglSelf.Width / 2;
             double scale = (double)wid * 0.903;
 
-            if (cboxIsZoom.Checked && !zoomToggle)
+            if (checkBoxZoomIn.Checked && !zoomToggle)
             {
                 sX = ((halfWid - (double)ptt.X) / wid) * 1.1;
                 sY = ((halfWid - (double)ptt.Y) / -wid) * 1.1;
@@ -406,7 +414,7 @@ namespace AgOpenGPS
                 if (nudSetDistance.Value != 0)
                     SetLineDistance();
 
-                btnSlice.Enabled = true;
+                btnClipLine.Enabled = true;
             }
         }
 
@@ -567,7 +575,7 @@ namespace AgOpenGPS
             oglSelf.Refresh();
             if (sliceArr.Count == 0)
             {
-                btnSlice.Enabled = false;
+                btnClipLine.Enabled = false;
                 btnALength.Enabled = false;
                 btnBLength.Enabled = false;
                 btnAShrink.Enabled = false;
@@ -575,7 +583,7 @@ namespace AgOpenGPS
             }
             else
             {
-                btnSlice.Enabled = true;
+                btnClipLine.Enabled = true;
                 btnBLength.Enabled = true;
                 btnALength.Enabled = true;
                 btnAShrink.Enabled = true;
@@ -691,14 +699,12 @@ namespace AgOpenGPS
 
         private void nudSetDistance_Click(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NudlessNumericUpDown)sender, this);
+            ((NudlessNumericUpDown)sender).ShowKeypad(this);
             btnExit.Focus();
         }
 
         // Returns 1 if the lines intersect, otherwis
         public double iE = 0, iN = 0;
-
-        public List<int> crossings = new List<int>(1);
 
         private void btnBndLoop_Click(object sender, EventArgs e)
         {

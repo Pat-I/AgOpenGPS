@@ -29,21 +29,30 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
 
-    - name: Restore NuGet packages
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}} -PackagesDirectory .\SourceCode\packages -source "https://api.nuget.org/v3/index.json"
+    - name: Setup GitVersion
+      uses: gittools/actions/gitversion/setup@v3.1.11
+      with:
+        versionSpec: '5.12.x'
+
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v3.1.11
+      with:
+        updateAssemblyInfo: true
+
+    - name: Install dependencies
+      run: dotnet restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      run: dotnet build --no-restore --configuration ${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Create AgOpenGPS.zip
-      shell: powershell
-      run: Compress-Archive -Path "AgOpenGPS" -Destination "AgOpenGPS.zip"
+    - name: Test
+      run: dotnet test --no-restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AgOpenGPS.zip
-        path: AgOpenGPS.zip
+        name: AgOpenGPS
+        path: AgOpenGPS

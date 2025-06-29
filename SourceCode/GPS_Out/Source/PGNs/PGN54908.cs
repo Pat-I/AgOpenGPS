@@ -220,9 +220,6 @@ namespace GPS_Out
             }
         }
 
-        public float RollSource1
-        { get { return cRoll; } }
-
         public UInt16 Satellites
         {
             get

@@ -1,4 +1,4 @@
-﻿using AgOpenGPS.Culture;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using System;
 using System.Globalization;
@@ -75,23 +75,19 @@ namespace AgOpenGPS
         {
             timer1.Interval = (int)((1 / mf.gpsHz) * 1000);
 
-            unoChart.ChartAreas[0].AxisY.Minimum = -1000;
-            unoChart.ChartAreas[0].AxisY.Maximum = 1000;
+            unoChart.ChartAreas[0].AxisY.Maximum = Double.NaN;
+            unoChart.ChartAreas[0].AxisY.Minimum = Double.NaN;
+            unoChart.ChartAreas[0].RecalculateAxesScale();
             unoChart.ResetAutoValues();
-
-            lblMax.Text = ((int)(unoChart.ChartAreas[0].AxisY.Maximum * 0.01)).ToString();
-            lblMin.Text = ((int)(unoChart.ChartAreas[0].AxisY.Minimum * 0.01)).ToString();
+            lblMax.Text = "Auto";
+            lblMin.Text = "";
+            isAuto = true;
 
             if (!ScreenHelper.IsOnScreen(Bounds))
             {
                 Top = 0;
                 Left = 0;
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Close();
         }
 
         private void btnGainUp_Click(object sender, EventArgs e)

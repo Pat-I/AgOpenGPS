@@ -1,14 +1,11 @@
 ﻿//Please, if you use this, share the improvements
 
 using AgLibrary.Logging;
-using AgOpenGPS.Culture;
+using AgOpenGPS.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace AgOpenGPS
 {
@@ -52,7 +49,7 @@ namespace AgOpenGPS
         public vec2 lastReverseFix = new vec2(0, 0);
 
         //headings
-        public double fixHeading = 0.0, camHeading = 0.0, smoothCamHeading = 0, gpsHeading = 10.0, prevGPSHeading = 0.0;
+        public double camHeading = 0.0, smoothCamHeading = 0, gpsHeading = 10.0, prevGPSHeading = 0.0;
 
         //storage for the cos and sin of heading
         public double cosSectionHeading = 1.0, sinSectionHeading = 0.0;
@@ -122,6 +119,8 @@ namespace AgOpenGPS
         //public double jumpDistanceAlarm = 20;
         //public int jumpCounter = 0;
 
+        public double camSmoothFactor = ((double)(Properties.Settings.Default.setDisplay_camSmooth) * 0.004) + 0.2;
+
         public void UpdateFixPosition()
         {
             //swFrame.Stop();
@@ -150,6 +149,21 @@ namespace AgOpenGPS
             pn.speed = pn.vtgSpeed;
             pn.AverageTheSpeed();
 
+            if (Properties.Settings.Default.setGPS_headingFromWhichSource == "Dual" && ahrs.autoSwitchDualFixOn)
+            {
+                if (Math.Abs(pn.speed) > ahrs.autoSwitchDualFixSpeed)
+                {
+                    headingFromSource = "Fix";
+                    ahrs.isDualAsIMU = true;
+                }
+                else
+                {
+                    headingFromSource = "Dual";
+                    ahrs.isDualAsIMU = false;
+                    ahrs.imuHeading = 99999;
+                }
+            }
+
             #region Heading
             switch (headingFromSource)
             {
@@ -157,6 +171,11 @@ namespace AgOpenGPS
                 case "Fix":
                     {
                         #region Start
+
+                        if (Properties.Settings.Default.setGPS_headingFromWhichSource == "Dual" && ahrs.autoSwitchDualFixOn)
+                        {
+                            lblSpeed.ForeColor = System.Drawing.Color.Red;
+                        }
 
                         distanceCurrentStepFixDisplay = glm.Distance(prevDistFix, pn.fix);
                         distanceCurrentStepFixDisplay *= 100;
@@ -245,19 +264,19 @@ namespace AgOpenGPS
                                 camHeading = glm.toDegrees(gpsHeading);
 
                                 //now we have a heading, fix the first 3
-                                if (vehicle.antennaOffset != 0)
+                                if (vehicle.VehicleConfig.AntennaOffset != 0)
                                 {
                                     for (int i = 0; i < 3; i++)
                                     {
-                                        stepFixPts[i].easting = (Math.Cos(-gpsHeading) * vehicle.antennaOffset) + stepFixPts[i].easting;
-                                        stepFixPts[i].northing = (Math.Sin(-gpsHeading) * vehicle.antennaOffset) + stepFixPts[i].northing;
+                                        stepFixPts[i].easting = (Math.Cos(-gpsHeading) * vehicle.VehicleConfig.AntennaOffset) + stepFixPts[i].easting;
+                                        stepFixPts[i].northing = (Math.Sin(-gpsHeading) * vehicle.VehicleConfig.AntennaOffset) + stepFixPts[i].northing;
                                     }
                                 }
 
                                 if (ahrs.imuRoll != 88888)
                                 {
                                     //change for roll to the right is positive times -1
-                                    rollCorrectionDistance = Math.Tan(glm.toRadians((ahrs.imuRoll))) * -vehicle.antennaHeight;
+                                    rollCorrectionDistance = Math.Tan(glm.toRadians((ahrs.imuRoll))) * -vehicle.VehicleConfig.AntennaHeight;
 
                                     // roll to left is positive  **** important!!
                                     // not any more - April 30, 2019 - roll to right is positive Now! Still Important
@@ -285,10 +304,10 @@ namespace AgOpenGPS
                         #endregion
 
                         #region Offset Roll
-                        if (vehicle.antennaOffset != 0)
+                        if (vehicle.VehicleConfig.AntennaOffset != 0)
                         {
-                            pn.fix.easting = (Math.Cos(-gpsHeading) * vehicle.antennaOffset) + pn.fix.easting;
-                            pn.fix.northing = (Math.Sin(-gpsHeading) * vehicle.antennaOffset) + pn.fix.northing;
+                            pn.fix.easting = (Math.Cos(-gpsHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.easting;
+                            pn.fix.northing = (Math.Sin(-gpsHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.northing;
                         }
 
                         uncorrectedEastingGraph = pn.fix.easting;
@@ -297,7 +316,7 @@ namespace AgOpenGPS
                         if (ahrs.imuRoll != 88888)
                         {
                             //change for roll to the right is positive times -1
-                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.antennaHeight;
+                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.VehicleConfig.AntennaHeight;
                             correctionDistanceGraph = rollCorrectionDistance;
 
                             pn.fix.easting = (Math.Cos(-gpsHeading) * rollCorrectionDistance) + pn.fix.easting;
@@ -346,6 +365,7 @@ namespace AgOpenGPS
                         //imu on board
                         if (ahrs.imuHeading != 99999)
                         {
+                            isChangingDirection = false;
 
                             if (ahrs.isReverseOn)
                             {
@@ -373,10 +393,10 @@ namespace AgOpenGPS
                             }
 
                             if (isReverse)
-                                newGPSHeading -= glm.toRadians(vehicle.antennaPivot / 1
+                                newGPSHeading -= glm.toRadians(vehicle.VehicleConfig.AntennaPivot / 1
                                     * mc.actualSteerAngleDegrees * ahrs.reverseComp);
                             else
-                                newGPSHeading -= glm.toRadians(vehicle.antennaPivot / 1
+                                newGPSHeading -= glm.toRadians(vehicle.VehicleConfig.AntennaPivot / 1
                                     * mc.actualSteerAngleDegrees * ahrs.forwardComp);
 
                             if (newGPSHeading < 0) newGPSHeading += glm.twoPI;
@@ -468,10 +488,10 @@ namespace AgOpenGPS
                                     isReverse = false;
 
                                 if (isReverse)
-                                    newGPSHeading -= glm.toRadians(vehicle.antennaPivot / 1
+                                    newGPSHeading -= glm.toRadians(vehicle.VehicleConfig.AntennaPivot / 1
                                         * mc.actualSteerAngleDegrees * ahrs.reverseComp);
                                 else
-                                    newGPSHeading -= glm.toRadians(vehicle.antennaPivot / 1
+                                    newGPSHeading -= glm.toRadians(vehicle.VehicleConfig.AntennaPivot / 1
                                         * mc.actualSteerAngleDegrees * ahrs.forwardComp);
 
                                 if (newGPSHeading < 0) newGPSHeading += glm.twoPI;
@@ -480,6 +500,7 @@ namespace AgOpenGPS
                             else
                             {
                                 isReverse = false;
+                                isChangingDirection = false;
                             }
 
                             //set the headings
@@ -511,7 +532,7 @@ namespace AgOpenGPS
                         if (camDelta > glm.twoPI) camDelta -= glm.twoPI;
                         else if (camDelta < -glm.twoPI) camDelta += glm.twoPI;
 
-                        smoothCamHeading -= camDelta * camera.camSmoothFactor;
+                        smoothCamHeading -= camDelta * camSmoothFactor;
 
                         if (smoothCamHeading > glm.twoPI) smoothCamHeading -= glm.twoPI;
                         else if (smoothCamHeading < -glm.twoPI) smoothCamHeading += glm.twoPI;
@@ -548,7 +569,7 @@ namespace AgOpenGPS
                         if (camDelta > glm.twoPI) camDelta -= glm.twoPI;
                         else if (camDelta < -glm.twoPI) camDelta += glm.twoPI;
 
-                        smoothCamHeading -= camDelta * camera.camSmoothFactor;
+                        smoothCamHeading -= camDelta * camSmoothFactor;
 
                         if (smoothCamHeading > glm.twoPI) smoothCamHeading -= glm.twoPI;
                         else if (smoothCamHeading < -glm.twoPI) smoothCamHeading += glm.twoPI;
@@ -575,10 +596,10 @@ namespace AgOpenGPS
 
                         #region Antenna Offset
 
-                        if (vehicle.antennaOffset != 0)
+                        if (vehicle.VehicleConfig.AntennaOffset != 0)
                         {
-                            pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.antennaOffset) + pn.fix.easting;
-                            pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.antennaOffset) + pn.fix.northing;
+                            pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.easting;
+                            pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.northing;
                         }
                         #endregion
 
@@ -638,7 +659,7 @@ namespace AgOpenGPS
                         if (ahrs.imuRoll != 88888)
                         {
                             //change for roll to the right is positive times -1
-                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.antennaHeight;
+                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.VehicleConfig.AntennaHeight;
                             correctionDistanceGraph = rollCorrectionDistance;
 
                             // roll to left is positive  **** important!!
@@ -660,6 +681,12 @@ namespace AgOpenGPS
 
                 case "Dual":
                     {
+                        if (Properties.Settings.Default.setGPS_headingFromWhichSource == "Dual" && ahrs.autoSwitchDualFixOn)
+                        {
+                            lblSpeed.ForeColor = System.Drawing.Color.Green;
+                            isChangingDirection = false;
+                        }
+
                         isFirstHeadingSet = true;
                         //use Dual Antenna heading for camera and tractor graphic
                         fixHeading = glm.toRadians(pn.headingTrueDual);
@@ -667,17 +694,17 @@ namespace AgOpenGPS
 
                         uncorrectedEastingGraph = pn.fix.easting;
 
-                        if (vehicle.antennaOffset != 0)
+                        if (vehicle.VehicleConfig.AntennaOffset != 0)
                         {
-                            pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.antennaOffset) + pn.fix.easting;
-                            pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.antennaOffset) + pn.fix.northing;
+                            pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.easting;
+                            pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.VehicleConfig.AntennaOffset) + pn.fix.northing;
                         }
 
-                        if (ahrs.imuRoll != 88888 && vehicle.antennaHeight != 0)
+                        if (ahrs.imuRoll != 88888 && vehicle.VehicleConfig.AntennaHeight != 0)
                         {
 
                             //change for roll to the right is positive times -1
-                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.antennaHeight;
+                            rollCorrectionDistance = Math.Sin(glm.toRadians((ahrs.imuRoll))) * -vehicle.VehicleConfig.AntennaHeight;
                             correctionDistanceGraph = rollCorrectionDistance;
 
                             pn.fix.easting = (Math.Cos(-gpsHeading) * rollCorrectionDistance) + pn.fix.easting;
@@ -713,7 +740,7 @@ namespace AgOpenGPS
                             double delta = Math.Abs(Math.PI - Math.Abs(Math.Abs(newHeading - fixHeading) - Math.PI));
 
                             //are we going backwards
-                            isReverse = delta > 2 ? true : false;
+                            isReverse = (delta > 2);
 
                             //save for next meter check
                             lastReverseFix = pn.fix;
@@ -734,12 +761,20 @@ namespace AgOpenGPS
                         if (camDelta > glm.twoPI) camDelta -= glm.twoPI;
                         else if (camDelta < -glm.twoPI) camDelta += glm.twoPI;
 
-                        smoothCamHeading -= camDelta * camera.camSmoothFactor;
+                        smoothCamHeading -= camDelta * camSmoothFactor;
 
                         if (smoothCamHeading > glm.twoPI) smoothCamHeading -= glm.twoPI;
                         else if (smoothCamHeading < -glm.twoPI) smoothCamHeading += glm.twoPI;
 
                         camHeading = glm.toDegrees(smoothCamHeading);
+
+                        // FOR AUTOSWITCH DUALFIX2FIX START
+                        // save current fix and set as valid to make switch dual to fix2fix fluid
+                        for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
+                        stepFixPts[0].easting = pn.fix.easting;
+                        stepFixPts[0].northing = pn.fix.northing;
+                        stepFixPts[0].isSet = 1;
+                        // FOR AUTOSWITCH DUALFIX2FIX END
 
                         TheRest();
 
@@ -796,18 +831,15 @@ namespace AgOpenGPS
             #endregion
 
             #region Corrected Position
-            double latitud;
-            double longitud;
-
-            pn.ConvertLocalToWGS84(pn.fix.northing, pn.fix.easting, out latitud, out longitud);
+            Wgs84 latLon = AppModel.LocalPlane.ConvertGeoCoordToWgs84(pn.fix.ToGeoCoord());
             byte[] correctedPosition = new byte[30];
             correctedPosition[0] = 0x80;
             correctedPosition[1] = 0x81;
             correctedPosition[2] = 0x7F;
             correctedPosition[3] = 0x64;
             correctedPosition[4] = 24;
-            Buffer.BlockCopy(BitConverter.GetBytes(longitud), 0, correctedPosition, 5, 8);
-            Buffer.BlockCopy(BitConverter.GetBytes(latitud), 0, correctedPosition, 13, 8);
+            Buffer.BlockCopy(BitConverter.GetBytes(latLon.Longitude), 0, correctedPosition, 5, 8);
+            Buffer.BlockCopy(BitConverter.GetBytes(latLon.Latitude), 0, correctedPosition, 13, 8);
             Buffer.BlockCopy(BitConverter.GetBytes(glm.toDegrees(gpsHeading)), 0, correctedPosition, 21, 8);
             SendPgnToLoop(correctedPosition);
             #endregion
@@ -949,9 +981,10 @@ namespace AgOpenGPS
 
                 //setAngVel = glm.toDegrees(setAngVel);
 
-                if (isChangingDirection && ahrs.imuHeading == 99999)
+                if (!Properties.Settings.Default.setAutoSwitchDualFixOn && isChangingDirection && ahrs.imuHeading == 99999)
+                {
                     p_254.pgn[p_254.status] = 0;
-
+                }
                 //for now if backing up, turn off autosteer
                 if (!isSteerInReverse)
                 {
@@ -1159,9 +1192,9 @@ namespace AgOpenGPS
             {
                 //grab fix and elevation
                 sbGrid.Append(
-                      pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ","
-                    + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ","
-                    + Math.Round((pn.altitude - vehicle.antennaHeight),3).ToString(CultureInfo.InvariantCulture) + ","
+                    AppModel.CurrentLatLon.Latitude.ToString("N7", CultureInfo.InvariantCulture) + ","
+                    + AppModel.CurrentLatLon.Longitude.ToString("N7", CultureInfo.InvariantCulture) + ","
+                    + Math.Round((pn.altitude - vehicle.VehicleConfig.AntennaHeight),3).ToString(CultureInfo.InvariantCulture) + ","
                     + pn.fixQuality.ToString(CultureInfo.InvariantCulture) + ","
                     + pn.fix.easting.ToString("N2", CultureInfo.InvariantCulture) + ","
                     + pn.fix.northing.ToString("N2", CultureInfo.InvariantCulture) + ","
@@ -1217,12 +1250,12 @@ namespace AgOpenGPS
 
             //translate from pivot position to steer axle and pivot axle position
             //translate world to the pivot axle
-            pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * vehicle.antennaPivot);
-            pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * vehicle.antennaPivot);
+            pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * vehicle.VehicleConfig.AntennaPivot);
+            pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * vehicle.VehicleConfig.AntennaPivot);
             pivotAxlePos.heading = fixHeading;
 
-            steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
-            steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
+            steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.VehicleConfig.Wheelbase);
+            steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.VehicleConfig.Wheelbase);
             steerAxlePos.heading = fixHeading;
 
             //guidance look ahead distance based on time or tool width at least 
@@ -1233,8 +1266,8 @@ namespace AgOpenGPS
             
 
             //determine where the rigid vehicle hitch ends
-            hitchPos.easting = pn.fix.easting + (Math.Sin(fixHeading) * (tool.hitchLength - vehicle.antennaPivot));
-            hitchPos.northing = pn.fix.northing + (Math.Cos(fixHeading) * (tool.hitchLength - vehicle.antennaPivot));
+            hitchPos.easting = pn.fix.easting + (Math.Sin(fixHeading) * (tool.hitchLength - vehicle.VehicleConfig.AntennaPivot));
+            hitchPos.northing = pn.fix.northing + (Math.Cos(fixHeading) * (tool.hitchLength - vehicle.VehicleConfig.AntennaPivot));
 
             //tool attached via a trailing hitch
             if (tool.isToolTrailing)
@@ -1617,13 +1650,11 @@ namespace AgOpenGPS
             {
                 if (!isJobStarted)
                 {
-                    pn.latStart = pn.latitude;
-                    pn.lonStart = pn.longitude;
-                    pn.SetLocalMetersPerDegree();
+                    pn.DefineLocalPlane(AppModel.CurrentLatLon, false);
                 }
-
-                pn.ConvertWGS84ToLocal(pn.latitude, pn.longitude, out pn.fix.northing, out pn.fix.easting);
-
+                GeoCoord fixCoord = AppModel.LocalPlane.ConvertWgs84ToGeoCoord(AppModel.CurrentLatLon);
+                pn.fix.northing = fixCoord.Northing;
+                pn.fix.easting = fixCoord.Easting;
                 //Draw a grid once we know where in the world we are.
                 isFirstFixPositionSet = true;
 
@@ -1635,7 +1666,6 @@ namespace AgOpenGPS
 
                 return;
             }
-
             else
             {
                 prevFix.easting = pn.fix.easting; prevFix.northing = pn.fix.northing;

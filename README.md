@@ -29,11 +29,11 @@ See the PCB repo for PCB layouts, firmware for steering and rate control, machin
 Even on your desktop
 3. Run AgOpenGPS.exe
 
-## Add your own code
+## Building
 
 1. Clone this repository (e.g. use Visual Studio to do so)
-2. When succesfully cloned it create a git structure which is necessary to build the program.
-3. add your code and (re)build.
+2. Open the solution (`SourceCode/AgOpenGPS.sln`) in Visual Studio
+3. Add your code and (re)build
 
 ## Contributing
 
@@ -49,11 +49,10 @@ In order to contribute to AgOpenGPS, follow these steps:
 
 ## Links
 
-- [AgOpenGPS Wiki](https://github.com/agopengps-official/AgOpenGPS/wiki)
+- [AgOpenGPS Documentation](https://docs.agopengps.com/)
 - [AgOpenGPS Forum](https://discourse.agopengps.com/)
 - [PCB and Firmware Repository](https://github.com/agopengps-official/Boards)
 - [SK21 Rate Control Repository](https://github.com/agopengps-official/Rate_Control)
-- [Hardware Wiki](https://github.com/agopengps-official/Boards/wiki)
 
 ## License
 

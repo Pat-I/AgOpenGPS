@@ -1,5 +1,6 @@
 using AgLibrary.Logging;
-using AgOpenGPS.Culture;
+using AgOpenGPS.Core.Models;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using System;
 using System.Drawing;
@@ -13,7 +14,7 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf = null;
 
-        private double easting, norting, latK, lonK;
+        private double latK, lonK;
         private int fenceSelected = -1;
 
         private bool isClosing;
@@ -28,7 +29,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsStartDeleteABoundary;
 
             //Column Header
-            Boundary.Text = "Bounds";
+            labelBounds.Text = gStr.gsBoundary;
             Thru.Text = gStr.gsDriveThru;
             Area.Text = gStr.gsArea;
             btnDelete.Enabled = false;
@@ -72,7 +73,7 @@ namespace AgOpenGPS
 
             flp1.Controls.Clear();
 
-            Font backupfont = new Font(Font.FontFamily, 18F, FontStyle.Bold);
+            System.Drawing.Font backupfont = new System.Drawing.Font(base.Font.FontFamily, 18F, FontStyle.Bold);
 
             for (int i = 0; i < mf.bnd.bndList.Count; i++)
             {
@@ -199,11 +200,6 @@ namespace AgOpenGPS
             UpdateChart();
         }
 
-        private void btnSerialCancel_Click(object sender, EventArgs e)
-        {
-            mf.bnd.isOkToAddPoints = false;
-        }
-
         private void btnDelete_Click(object sender, EventArgs e)
         {
             DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
@@ -250,31 +246,10 @@ namespace AgOpenGPS
         {
             //save new copy of kml with selected flag and view in GoogleEarth
 
-            mf.FileMakeKMLFromCurrentPosition(mf.pn.latitude, mf.pn.longitude);
+            mf.FileMakeKMLFromCurrentPosition(mf.AppModel.CurrentLatLon);
             System.Diagnostics.Process.Start(Path.Combine(RegistrySettings.fieldsDirectory, mf.currentFieldDirectory, "CurrentPosition.KML"));
             isClosing = true;
             Close();
-        }
-
-        private void btnDeleteAll_Click(object sender, EventArgs e)
-        {
-            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
-                gStr.gsDeleteForSure,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2);
-
-            if (result3 == DialogResult.Yes)
-            {
-                ResetAllBoundary();
-
-                mf.bnd.isOkToAddPoints = false;
-                mf.fd.UpdateFieldBoundaryGUIAreas();
-            }
-            else
-            {
-                mf.TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
-            }
         }
 
         private void btnReturn_Click(object sender, EventArgs e)
@@ -383,10 +358,8 @@ namespace AgOpenGPS
                                         double.TryParse(fix[0], NumberStyles.Float, CultureInfo.InvariantCulture, out lonK);
                                         double.TryParse(fix[1], NumberStyles.Float, CultureInfo.InvariantCulture, out latK);
 
-                                        mf.pn.ConvertWGS84ToLocal(latK, lonK, out norting, out easting);
-
-                                        //add the point to boundary
-                                        New.fenceLine.Add(new vec3(easting, norting, 0));
+                                        GeoCoord geoCoord = mf.AppModel.LocalPlane.ConvertWgs84ToGeoCoord(new Wgs84(latK, lonK));
+                                        New.fenceLine.Add(new vec3(geoCoord));
                                     }
 
                                     New.CalculateFenceArea(mf.bnd.bndList.Count);

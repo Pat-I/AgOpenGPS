@@ -1,14 +1,12 @@
-﻿using System;
+﻿using AgLibrary.Logging;
+using AgOpenGPS.Core.Models;
+using AgOpenGPS.Core.Translations;
+using System;
+using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Globalization;
-using System.Diagnostics;
-using System.Xml.Linq;
-using AgOpenGPS.Culture;
-using System.Text;
-using AgLibrary.Logging;
 
 namespace AgOpenGPS
 {
@@ -70,13 +68,13 @@ namespace AgOpenGPS
 
                             if (Lon != double.MaxValue && Lat != double.MaxValue)
                             {
-                                if (timerSim.Enabled)
-                                    DisableSim();
+                                if (timerSim.Enabled) DisableSim();
 
-                                pn.longitude = Lon;
-                                pn.latitude = Lat;
+                                AppModel.CurrentLatLon = new Wgs84(Lat, Lon);
 
-                                pn.ConvertWGS84ToLocal(Lat, Lon, out pn.fix.northing, out pn.fix.easting);
+                                GeoCoord fixCoord = AppModel.LocalPlane.ConvertWgs84ToGeoCoord(AppModel.CurrentLatLon);
+                                pn.fix.northing = fixCoord.Northing;
+                                pn.fix.easting = fixCoord.Easting;
 
                                 //From dual antenna heading sentences
                                 float temp = BitConverter.ToSingle(data, 21);
@@ -85,6 +83,8 @@ namespace AgOpenGPS
                                     pn.headingTrueDual = temp + pn.headingTrueDualOffset;
                                     if (pn.headingTrueDual >= 360) pn.headingTrueDual -= 360;
                                     else if (pn.headingTrueDual < 0) pn.headingTrueDual += 360;
+
+                                    if (ahrs.isDualAsIMU) ahrs.imuHeading = pn.headingTrueDual;
                                 }
 
                                 //from single antenna sentences (VTG,RMC)
@@ -269,8 +269,8 @@ namespace AgOpenGPS
                                 Log.EventWriter(lblHardwareMessage.Text);
 
                                 //color based on byte 6
-                                if (data[6] == 0) lblHardwareMessage.BackColor = Color.Salmon;
-                                else lblHardwareMessage.BackColor = Color.Bisque;
+                                lblHardwareMessage.BackColor = data[6] == 0 ? Color.Salmon : Color.Bisque;
+                                lblHardwareMessage.ForeColor = Color.Black;
                             }
                             else
                             {
@@ -279,7 +279,7 @@ namespace AgOpenGPS
                             }
                             break;
                         }
-                    case 222: // DE
+                    case 222: // 0xDE
                         {
                             //{ 0x80, 0x81, 0x7f, 222, number bytes, mask, command CRC };
                             if (data.Length < 6) break;
@@ -289,6 +289,12 @@ namespace AgOpenGPS
                                 if ((data[6] & 1) != 1) { trk.NudgeTrack(-dist); }
                                 if ((data[6] & 1) == 1) { trk.NudgeTrack(dist); }
                             }
+                            if (((data[5] & 2) == 2)) //mask bit #1 set and command bit #0 cycle line to the 0 = left 1 = right
+                            {
+                                if ((data[6] & 1) != 1) {  btnCycleLines.PerformClick(); }
+                                if ((data[6] & 1) == 1) { btnCycleLinesBk.PerformClick(); }
+                            }
+                           
                             break;
                         }
 

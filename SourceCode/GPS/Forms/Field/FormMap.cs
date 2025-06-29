@@ -1,5 +1,6 @@
 ﻿using AgLibrary.Logging;
-using AgOpenGPS.Culture;
+using AgOpenGPS.Core.Models;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -26,6 +27,12 @@ namespace AgOpenGPS
             mf = callingForm as FormGPS;
 
             InitializeComponent();
+            //translate all the controls
+            this.Text = gStr.gsMapForBackground;
+            labelNewBoundary.Text = gStr.gsNew + " " + gStr.gsBoundary; 
+            labelBoundary.Text = gStr.gsBoundary;
+            lblPoints.Text = gStr.gsPoints + ":";
+            labelBackground.Text = gStr.gsBackground;
 
             mapControl.CacheFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MapControl");
 
@@ -48,18 +55,13 @@ namespace AgOpenGPS
             Size = Properties.Settings.Default.setWindow_BingMapSize;
 
             mapControl.ZoomLevel = Properties.Settings.Default.setWindow_BingZoom;//mapControl
-            mapControl.Center = new GeoPoint((float)mf.pn.longitude, (float)mf.pn.latitude);
+            mapControl.Center = new GeoPoint(
+                (float)mf.AppModel.CurrentLatLon.Longitude,
+                (float)mf.AppModel.CurrentLatLon.Latitude);
 
             mapControl.Invalidate();
 
-            if (mf.worldGrid.isGeoMap)
-            {
-                cboxDrawMap.Checked = true;
-            }
-            else
-            {
-                cboxDrawMap.Checked = false;
-            }
+            cboxDrawMap.Checked = mf.worldGrid.isGeoMap;
 
             if (mf.worldGrid.isGeoMap) cboxDrawMap.Image = Properties.Resources.MappingOn;
             else cboxDrawMap.Image = Properties.Resources.MappingOff;
@@ -71,7 +73,6 @@ namespace AgOpenGPS
             }
 
             btnDeleteAll.Enabled = true;
-            label3.Text = gStr.gsBoundary;
         }
 
         private void FormMap_FormClosing(object sender, FormClosingEventArgs e)
@@ -81,7 +82,6 @@ namespace AgOpenGPS
                 e.Cancel = true;
                 return;
             }
-
             Properties.Settings.Default.setWindow_BingMapSize = Size;
             Properties.Settings.Default.setWindow_BingZoom = mapControl.ZoomLevel;
             Properties.Settings.Default.Save();
@@ -109,12 +109,6 @@ namespace AgOpenGPS
             UpdateWindowTitle();
         }
 
-        private void btnClearCache_Click(object sender, EventArgs e)
-        {
-            mapControl.ClearCache(true);
-            ActiveControl = mapControl;
-        }
-
         private void cmbTileServers_SelectedIndexChanged(object sender, EventArgs e)
         {
             mapControl.TileServer = cmbTileServers.SelectedItem as ITileServer;
@@ -131,25 +125,20 @@ namespace AgOpenGPS
         //    }
         //}
 
-        private void mapControl_DoubleClick(object sender, EventArgs e)
-        {
-            //var coord = mapControl.Mouse;
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"Location: {coord}");
-            //MessageBox.Show(sb.ToString(), "Info");
-        }
-
         private void btnGo_Click(object sender, EventArgs e)
         {
+            mapControl.Center = new GeoPoint(
+                (float)mf.AppModel.CurrentLatLon.Longitude,
+                (float)mf.AppModel.CurrentLatLon.Latitude);
             if (bingLine.Count == 0)
             {
+                mapControl.Markers.Clear();
                 if (mapControl.Markers.Count == 0)
                 {
-                    mapControl.Markers.Clear();
-                    mapControl.Center = new GeoPoint((float)mf.pn.longitude, (float)mf.pn.latitude);
-
                     // Create marker's location point
-                    var point = new GeoPoint((float)mf.pn.longitude, (float)mf.pn.latitude);
+                    var point = new GeoPoint(
+                        (float)mf.AppModel.CurrentLatLon.Longitude,
+                        (float)mf.AppModel.CurrentLatLon.Latitude);
 
                     var style = new MarkerStyle(10);
 
@@ -158,26 +147,10 @@ namespace AgOpenGPS
 
                     // Add marker to the map
                     mapControl.Markers.Add(marker);
-
-                    UpdateWindowTitle();
-                    mapControl.Invalidate();
-                }
-                else
-                {
-                    mapControl.Markers.Clear();
-                    mapControl.Center = new GeoPoint((float)mf.pn.longitude, (float)mf.pn.latitude);
-
-                    UpdateWindowTitle();
-                    mapControl.Invalidate();
                 }
             }
-            else
-            {
-                mapControl.Center = new GeoPoint((float)mf.pn.longitude, (float)mf.pn.latitude);
-
-                UpdateWindowTitle();
-                mapControl.Invalidate();
-            }
+            UpdateWindowTitle();
+            mapControl.Invalidate();
         }
 
         private void mapControl_Click(object sender, EventArgs e)
@@ -232,9 +205,8 @@ namespace AgOpenGPS
                 CBoundaryList New = new CBoundaryList();
                 for (int i = 0; i < bingLine.Count; i++)
                 {
-                    mf.pn.ConvertWGS84ToLocal(bingLine[i].Latitude, bingLine[i].Longitude, out double nort, out double east);
-                    vec3 v = new vec3(east, nort, 0);
-                    New.fenceLine.Add(v);
+                    GeoCoord geoCoord = mf.AppModel.LocalPlane.ConvertWgs84ToGeoCoord(new Wgs84(bingLine[i].Latitude, bingLine[i].Longitude));
+                    New.fenceLine.Add(new vec3(geoCoord));
                 }
 
                 New.CalculateFenceArea(mf.bnd.bndList.Count);
@@ -333,9 +305,9 @@ namespace AgOpenGPS
 
                 btnAddFence.Enabled = false;
                 btnDeletePoint.Enabled = false;
-
             }
         }
+
         private void SaveBackgroundImage()
         {
             if (bingLine.Count > 0)
@@ -344,20 +316,21 @@ namespace AgOpenGPS
                 return;
             }
 
-            mf.worldGrid.isGeoMap = true;
-
             GeoPoint geoRef = mapControl.TopLeft;
-            mf.pn.ConvertWGS84ToLocal(geoRef.Latitude, geoRef.Longitude, out double nor, out double eas);
-            if (Math.Abs(nor) > 4000 || Math.Abs(eas) > 4000) mf.worldGrid.isGeoMap = false;
-            mf.worldGrid.northingMaxGeo = nor;
-            mf.worldGrid.eastingMinGeo = eas;
+            GeoCoord topLeftGeoCoord = mf.AppModel.LocalPlane.ConvertWgs84ToGeoCoord(new Wgs84(geoRef.Latitude, geoRef.Longitude));
+            mf.worldGrid.northingMaxGeo = topLeftGeoCoord.Northing;
+            mf.worldGrid.eastingMinGeo = topLeftGeoCoord.Easting;
 
             geoRef = mapControl.BottomRight;
-            mf.pn.ConvertWGS84ToLocal(geoRef.Latitude, geoRef.Longitude, out nor, out eas);
-            if (Math.Abs(nor) > 4000 || Math.Abs(eas) > 4000) mf.worldGrid.isGeoMap = false;
-            mf.worldGrid.northingMinGeo = nor;
-            mf.worldGrid.eastingMaxGeo = eas;
+            GeoCoord bottomRightGeoCoord = mf.AppModel.LocalPlane.ConvertWgs84ToGeoCoord(new Wgs84(geoRef.Latitude, geoRef.Longitude));
+            mf.worldGrid.northingMinGeo = bottomRightGeoCoord.Northing;
+            mf.worldGrid.eastingMaxGeo = bottomRightGeoCoord.Easting;
 
+            mf.worldGrid.isGeoMap =
+                Math.Abs(mf.worldGrid.northingMaxGeo) <= 4000 &&
+                Math.Abs(mf.worldGrid.eastingMinGeo) <= 4000 &&
+                Math.Abs(mf.worldGrid.northingMinGeo) <= 4000 &&
+                Math.Abs(mf.worldGrid.eastingMaxGeo) <= 4000;
 
             if (!mf.worldGrid.isGeoMap)
             {
@@ -381,15 +354,7 @@ namespace AgOpenGPS
                 if (File.Exists(fileAndDirectory))
                     File.Delete(fileAndDirectory);
                 bitmap.Save(fileAndDirectory, ImageFormat.Png);
-
-                GL.BindTexture(TextureTarget.Texture2D, mf.texture[(int)FormGPS.textures.bingGrid]);
-                BitmapData bitmapData = bitmap.LockBits(new
-                    Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly,
-                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0,
-                    PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0,
-                    OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                bitmap.UnlockBits(bitmapData);
+                mf.worldGrid.BingBitmap = bitmap;
             }
             catch
             {
@@ -430,17 +395,6 @@ namespace AgOpenGPS
                     writer.WriteLine(-300);
                 }
             }
-
-        }
-
-        private void btnBuildFieldBackground_Click(object sender, EventArgs e)
-        {
-            if (mf.worldGrid.isGeoMap)
-            {
-                mf.worldGrid.isGeoMap = false;
-                ResetMapGrid();
-            }
-            SaveBackgroundImage();
         }
 
         private void cboxDrawMap_Click(object sender, EventArgs e)
@@ -469,17 +423,7 @@ namespace AgOpenGPS
 
         private void ResetMapGrid()
         {
-            using (Bitmap bitmap = Properties.Resources.z_bingMap)
-            {
-                GL.GenTextures(1, out mf.texture[(int)FormGPS.textures.bingGrid]);
-                GL.BindTexture(TextureTarget.Texture2D, mf.texture[(int)FormGPS.textures.bingGrid]);
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                bitmap.UnlockBits(bitmapData);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-            }
-
+            mf.worldGrid.BingBitmap = Properties.Resources.z_bingMap;
             string fileAndDirectory = Path.Combine(RegistrySettings.fieldsDirectory, mf.currentFieldDirectory, "BackPic.png");
             try
             {
@@ -492,19 +436,6 @@ namespace AgOpenGPS
             bingLine.Clear();
             mapControl.Markers.Clear();
             mapControl.Invalidate();
-        }
-
-        private void btnGray_Click(object sender, EventArgs e)
-        {
-            isColorMap = !isColorMap;
-            //if (isColorMap)
-            //{
-            //    btnGray.Image = Properties.Resources.MapColor;
-            //}
-            //else
-            //{
-            //    btnGray.Image = Properties.Resources.MapGray;
-            //}
         }
 
         private void btnZoomOut_Click(object sender, EventArgs e)

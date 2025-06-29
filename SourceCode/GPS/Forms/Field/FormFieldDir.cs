@@ -1,5 +1,6 @@
 ﻿using AgLibrary.Logging;
-using AgOpenGPS.Culture;
+using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using System;
 using System.Globalization;
@@ -21,7 +22,7 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            label1.Text = gStr.gsEnterFieldName;
+            labelEnterFieldName.Text = gStr.gsEnterFieldName;
             this.Text = gStr.gsCreateNewField;
         }
 
@@ -100,13 +101,9 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    mf.pn.latStart = mf.pn.latitude; mf.pn.lonStart = mf.pn.longitude;
-
-                    mf.pn.SetLocalMetersPerDegree();
+                    mf.pn.DefineLocalPlane(mf.AppModel.CurrentLatLon, false);
 
                     dirNewField.Create();
-
-                    mf.displayFieldName = mf.currentFieldDirectory;
 
                     //create the field file header info
                     mf.FileCreateField();
@@ -137,25 +134,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender, this);
-                btnSerialCancel.Focus();
-            }
-        }
-
-        private void tboxTask_Click(object sender, EventArgs e)
-        {
-            if (mf.isKeyboardOn)
-            {
-                mf.KeyboardToText((TextBox)sender, this);
-                btnSerialCancel.Focus();
-            }
-        }
-
-        private void tboxVehicle_Click(object sender, EventArgs e)
-        {
-            if (mf.isKeyboardOn)
-            {
-                mf.KeyboardToText((TextBox)sender, this);
+                ((TextBox)sender).ShowKeyboard(this);
                 btnSerialCancel.Focus();
             }
         }

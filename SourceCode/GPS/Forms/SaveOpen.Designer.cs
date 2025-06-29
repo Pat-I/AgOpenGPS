@@ -1,4 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,12 +9,16 @@ using System.IO;
 using System.Globalization;
 using System.Xml;
 using System.Text;
-using AgOpenGPS.Culture;
 using AgLibrary.Logging;
+using AgOpenGPS.Protocols.ISOBUS;
+using AgOpenGPS.Core.Models;
+using AgOpenGPS.Core.Streamers;
+using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Properties;
+using System.Threading.Tasks;
 
 namespace AgOpenGPS
 {
-    
     public partial class FormGPS
     {
         //list of the list of patch data individual triangles for field sections
@@ -33,183 +37,16 @@ namespace AgOpenGPS
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
 
-            string myFileName = "TASKDATA.xml";
-
             try
             {
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.IndentChars = "  ";
-                XmlWriter xml = XmlWriter.Create(Path.Combine(directoryName, myFileName), settings);
-
-                xml.WriteStartElement("ISO11783_TaskData");//Settings
-                xml.WriteAttributeString("DataTransferOrigin", "1");
-                xml.WriteAttributeString("ManagementSoftwareManufacturer", "AgOpenGPS");
-                xml.WriteAttributeString("ManagementSoftwareVersion", "1.4.0");
-                xml.WriteAttributeString("VersionMajor", "3");
-                xml.WriteAttributeString("VersionMinor", "3");
-
-                {
-                    //PFD A = "Field ID" B = "Code" C = "Name" D = "Area sq m" E = "Customer Ref" F = "Farm Ref" >
-                    xml.WriteStartElement("PFD");//Field
-                    xml.WriteAttributeString("A", "PFD-1");
-                    xml.WriteAttributeString("C", currentFieldDirectory);
-                    xml.WriteAttributeString("D", ((int)(fd.areaOuterBoundary)).ToString());
-
-                    double lat = 0;
-                    double lon = 0;
-
-                    {
-                        //all the boundaries
-                        /*
-                        < PLN A = "1" C="Area in Sq M like 12568" >
-                            < LSG A = "1" >
-                                < PNT A = "2" C = "51.61918340" D = "4.51054560" />
-                                < PNT A = "2" C = "51.61915460" D = "4.51056120" />
-                            </ LSG >
-                        </ PLN >
-                        */
-                        for (int i = 0; i < bnd.bndList.Count; i++)
-                        {
-                            xml.WriteStartElement("PLN");//BND
-
-                            if (i == 0) xml.WriteAttributeString("A", "1"); //outerBnd
-                            else xml.WriteAttributeString("A", "6");  //innerBnd
-
-                            xml.WriteStartElement("LSG");//Polygon
-                            xml.WriteAttributeString("A", "1");
-
-                            for (int j = 0; j < bnd.bndList[i].fenceLineEar.Count; j++)
-                            {
-
-                                pn.ConvertLocalToWGS84(bnd.bndList[i].fenceLineEar[j].northing, bnd.bndList[i].fenceLineEar[j].easting, out lat, out lon);
-                                xml.WriteStartElement("PNT");//Boundary Points
-                                xml.WriteAttributeString("A", "2");
-                                xml.WriteAttributeString("C", lat.ToString());
-                                xml.WriteAttributeString("D", lon.ToString());
-                                xml.WriteEndElement(); //Boundary Points                   
-                            }
-
-                            xml.WriteEndElement();//Polygon
-                            xml.WriteEndElement();//BND
-                        }
-
-                        //all the headlands A=10
-                        if (bnd.bndList.Count > 0)
-                        {
-                            for (int i = 0; i < bnd.bndList.Count; i++)
-                            {
-                                if (bnd.bndList[i].hdLine.Count < 1) continue;
-
-                                xml.WriteStartElement("PLN");//BND
-
-                                xml.WriteAttributeString("A", "10"); //headland
-
-                                xml.WriteStartElement("LSG");//Polygon
-                                xml.WriteAttributeString("A", "1");
-
-                                for (int j = 0; j < bnd.bndList[i].hdLine.Count; j++)
-                                {
-                                    pn.ConvertLocalToWGS84(bnd.bndList[i].hdLine[j].northing, bnd.bndList[i].hdLine[j].easting, out lat, out lon);
-                                    xml.WriteStartElement("PNT");//Boundary Points
-                                    xml.WriteAttributeString("A", "2");
-                                    xml.WriteAttributeString("C", lat.ToString());
-                                    xml.WriteAttributeString("D", lon.ToString());
-                                    xml.WriteEndElement(); //Boundary Points                   
-                                }
-
-                                xml.WriteEndElement();//Polygon
-                                xml.WriteEndElement();//BND
-                            }
-                        }
-
-                        //AB Lines
-                        /*
-                        LSG A = "5" B = "Line Name" >
-                            < PNT A = "2" C = "51.61851540" D = "4.51137030" />
-                            < PNT A = "2" C = "51.61912230" D = "4.51056060" />
-                        </ LSG >
-                        */
-
-                        if (trk.gArr != null && trk.gArr.Count > 0)
-                        {
-                            for (int i = 0; i < trk.gArr.Count; i++)
-                            {
-                                xml.WriteStartElement("LSG");//Line
-                                xml.WriteAttributeString("A", "5");
-                                xml.WriteAttributeString("B", trk.gArr[i].name);
-                                ///xml.WriteAttributeString("C", (tool.width).ToString());
-                                {
-                                    xml.WriteStartElement("PNT");//A
-
-                                    pn.ConvertLocalToWGS84(trk.gArr[i].ptA.northing - (Math.Cos(trk.gArr[i].heading) * 1000),
-                                        trk.gArr[i].ptA.easting - (Math.Sin(trk.gArr[i].heading) * 1000), out lat, out lon);
-
-                                    xml.WriteAttributeString("A", "2");
-                                    xml.WriteAttributeString("C", lat.ToString());
-                                    xml.WriteAttributeString("D", lon.ToString());
-
-                                    xml.WriteEndElement();//A
-                                    xml.WriteStartElement("PNT");//B
-
-                                    pn.ConvertLocalToWGS84(trk.gArr[i].ptA.northing + (Math.Cos(trk.gArr[i].heading) * 1000),
-                                        trk.gArr[i].ptA.easting + (Math.Sin(trk.gArr[i].heading) * 1000), out lat, out lon);
-
-                                    xml.WriteAttributeString("A", "2");
-
-                                    xml.WriteAttributeString("C", lat.ToString());
-                                    xml.WriteAttributeString("D", lon.ToString());
-                                }
-                                xml.WriteEndElement();//B
-                                xml.WriteEndElement();//Line
-                            }
-                        }
-
-                        //curves
-                        /*
-                        LSG A = "5" B = "Name Here" >
-                            < PNT A = "2" C = "51.61851540" D = "4.51137030" />
-                            < PNT A = "2" C = "51.61912230" D = "4.51056060" />
-                            < PNT A = "2" C = "51.61962230" D = "4.51056760" />
-                        </ LSG >
-                        */
-                        if (trk.gArr != null && trk.gArr.Count > 0)
-                        {
-                            for (int i = 0; i < trk.gArr.Count; i++)
-                            {
-                                xml.WriteStartElement("LSG");//Curve
-                                xml.WriteAttributeString("A", "5"); //denotes guidance
-                                xml.WriteAttributeString("B", trk.gArr[i].name);
-                                //xml.WriteAttributeString("C", (tool.width).ToString());
-
-                                for (int j = 0; j < trk.gArr[i].curvePts.Count; j++)
-                                {
-                                    xml.WriteStartElement("PNT");//point
-                                    pn.ConvertLocalToWGS84(trk.gArr[i].curvePts[j].northing,
-                                        trk.gArr[i].curvePts[j].easting, out lat, out lon);
-
-                                    xml.WriteAttributeString("A", "2");
-                                    xml.WriteAttributeString("C", lat.ToString());
-                                    xml.WriteAttributeString("D", lon.ToString());
-
-                                    xml.WriteEndElement();//point
-                                }
-                                xml.WriteEndElement(); //Curve   
-                            }
-                        }
-                    }
-
-                    //Last
-                    xml.WriteEndElement();//End Field
-                }
-
-                xml.WriteEndElement();//ISO11783_TaskData Settings
-
-                xml.Flush();
-
-                //Write the XML to file and close the kml
-                xml.Close();
-
+                ISO11783_TaskFile.Export(
+                    directoryName,
+                    currentFieldDirectory,
+                    (int)(fd.areaOuterBoundary),
+                    bnd.bndList,
+                    AppModel.LocalPlane,
+                    trk,
+                    ISO11783_TaskFile.Version.V3);
             }
             catch (Exception e)
             {
@@ -220,253 +57,28 @@ namespace AgOpenGPS
 
         public void ExportFieldAs_ISOXMLv4()
         {
-            int lineCounter = 0;
-
             //get the directory and make sure it exists, create if not
             string directoryName = Path.Combine(RegistrySettings.fieldsDirectory, currentFieldDirectory, "zISOXML", "v4");
 
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
-           
-            string myFileName = "TASKDATA.xml";
 
             try
             {
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.IndentChars = "  ";
-                XmlWriter xml = XmlWriter.Create(Path.Combine(directoryName, myFileName), settings);
-
-                xml.WriteStartElement("ISO11783_TaskData");//Settings
-                xml.WriteAttributeString("DataTransferOrigin", "1");
-                xml.WriteAttributeString("ManagementSoftwareManufacturer", "AgOpenGPS");
-                xml.WriteAttributeString("ManagementSoftwareVersion", "1.4.0");
-                xml.WriteAttributeString("VersionMajor", "4");
-                xml.WriteAttributeString("VersionMinor", "2");
-
-                {
-                    //PFD A = "Field ID" B = "Code" C = "Name" D = "Area sq m" E = "Customer Ref" F = "Farm Ref" >
-                    xml.WriteStartElement("PFD");//Field
-                    xml.WriteAttributeString("A", "PFD-1");
-                    xml.WriteAttributeString("C", currentFieldDirectory);
-                    xml.WriteAttributeString("D", ((int)(fd.areaOuterBoundary)).ToString());
-
-                    double lat = 0;
-                    double lon = 0;
-
-                    {
-                        //all the boundaries
-                        /*
-                        < PLN A = "1" C="Area in Sq M like 12568" >
-                            < LSG A = "1" >
-                                < PNT A = "2" C = "51.61918340" D = "4.51054560" />
-                                < PNT A = "2" C = "51.61915460" D = "4.51056120" />
-                            </ LSG >
-                        </ PLN >
-                        */
-                        for (int i = 0; i < bnd.bndList.Count; i++)
-                        {
-                            xml.WriteStartElement("PLN");//BND
-
-                            if (i == 0) xml.WriteAttributeString("A", "1"); //outerBnd
-                            else xml.WriteAttributeString("A", "6");  //innerBnd
-
-                            xml.WriteStartElement("LSG");//Polygon
-                            xml.WriteAttributeString("A", "1");
-
-                            for (int j = 0; j < bnd.bndList[i].fenceLineEar.Count; j++)
-                            {
-
-                                pn.ConvertLocalToWGS84(bnd.bndList[i].fenceLineEar[j].northing, bnd.bndList[i].fenceLineEar[j].easting, out lat, out lon);
-                                xml.WriteStartElement("PNT");//Boundary Points
-                                xml.WriteAttributeString("A", "10");
-                                xml.WriteAttributeString("C", lat.ToString());
-                                xml.WriteAttributeString("D", lon.ToString());
-                                xml.WriteEndElement(); //Boundary Points                   
-                            }
-
-                            xml.WriteEndElement();//Polygon
-                            xml.WriteEndElement();//BND
-                        }
-
-                        //all the headlands A=10
-                        if (bnd.bndList.Count > 0)
-                        {
-                            for (int i = 0; i < bnd.bndList.Count; i++)
-                            {
-                                if (bnd.bndList[i].hdLine.Count < 1) continue;
-
-                                xml.WriteStartElement("PLN");//BND
-
-                                xml.WriteAttributeString("A", "10"); //headland
-
-                                xml.WriteStartElement("LSG");//Polygon
-                                xml.WriteAttributeString("A", "1");
-
-                                for (int j = 0; j < bnd.bndList[i].hdLine.Count; j++)
-                                {
-                                    pn.ConvertLocalToWGS84(bnd.bndList[i].hdLine[j].northing, bnd.bndList[i].hdLine[j].easting, out lat, out lon);
-                                    xml.WriteStartElement("PNT");//Boundary Points
-                                    xml.WriteAttributeString("A", "10");
-                                    xml.WriteAttributeString("C", lat.ToString());
-                                    xml.WriteAttributeString("D", lon.ToString());
-                                    xml.WriteEndElement(); //Boundary Points                   
-                                }
-
-                                xml.WriteEndElement();//Polygon
-                                xml.WriteEndElement();//BND
-                            }
-                        }
-
-                        //AB Lines
-                        /*
-                        LSG A = "5" B = "Line Name" >
-                            < PNT A = "2" C = "51.61851540" D = "4.51137030" />
-                            < PNT A = "2" C = "51.61912230" D = "4.51056060" />
-                        </ LSG >
-                        */
-
-                        if (trk.gArr != null && trk.gArr.Count > 0)
-                        {
-                            for (int i = 0; i < trk.gArr.Count; i++)
-                            {
-                                xml.WriteStartElement("GGP");//Guide-P
-                                string name = "GGP" + lineCounter.ToString();
-                                lineCounter++;
-                                xml.WriteAttributeString("A", name);
-                                xml.WriteAttributeString("B", trk.gArr[i].name);
-                                {
-                                    xml.WriteStartElement("GPN");//Guide-N
-                                    xml.WriteAttributeString("A", name);
-                                    xml.WriteAttributeString("B", trk.gArr[i].name);
-                                    xml.WriteAttributeString("C", "1");
-                                    xml.WriteAttributeString("E", "1");
-                                    xml.WriteAttributeString("F", "1");
-                                    xml.WriteAttributeString("I", "16");
-                                    {
-                                        xml.WriteStartElement("LSG");//Line
-                                        xml.WriteAttributeString("A", "5");
-                                        {
-                                            xml.WriteStartElement("PNT");//A
-
-                                            pn.ConvertLocalToWGS84(trk.gArr[i].ptA.northing - (Math.Cos(trk.gArr[i].heading) * 1000),
-                                                trk.gArr[i].ptA.easting - (Math.Sin(trk.gArr[i].heading) * 1000), out lat, out lon);
-
-                                            xml.WriteAttributeString("A", "6");
-                                            xml.WriteAttributeString("C", lat.ToString());
-                                            xml.WriteAttributeString("D", lon.ToString());
-
-                                            xml.WriteEndElement();//A
-                                            xml.WriteStartElement("PNT");//B
-
-                                            pn.ConvertLocalToWGS84(trk.gArr[i].ptA.northing + (Math.Cos(trk.gArr[i].heading) * 1000),
-                                                trk.gArr[i].ptA.easting + (Math.Sin(trk.gArr[i].heading) * 1000), out lat, out lon);
-
-                                            xml.WriteAttributeString("A", "7");
-
-                                            xml.WriteAttributeString("C", lat.ToString());
-                                            xml.WriteAttributeString("D", lon.ToString());
-                                            xml.WriteEndElement();//B
-                                        }
-                                        xml.WriteEndElement();//Line
-                                    }
-                                    xml.WriteEndElement(); //Guide-N
-                                }
-                                xml.WriteEndElement(); //Guide-P
-                            }
-                        }
-
-                        //curves
-                        /*
-                        LSG A = "5" B = "Name Here" >
-                            < PNT A = "2" C = "51.61851540" D = "4.51137030" />
-                            < PNT A = "2" C = "51.61912230" D = "4.51056060" />
-                            < PNT A = "2" C = "51.61962230" D = "4.51056760" />
-                        </ LSG >
-                        */
-
-                        if (trk.gArr != null && trk.gArr.Count > 0)
-                        {
-                            for (int i = 0; i < trk.gArr.Count; i++)
-                            {
-                                xml.WriteStartElement("GGP");//Guide-P
-                                string name = "GGP" + lineCounter.ToString();
-                                lineCounter++;
-                                xml.WriteAttributeString("A", name);
-                                xml.WriteAttributeString("B", trk.gArr[i].name);
-                                {
-                                    xml.WriteStartElement("GPN");//Guide-N
-                                    xml.WriteAttributeString("A", name);
-                                    xml.WriteAttributeString("B", trk.gArr[i].name);
-                                    xml.WriteAttributeString("C", "3");
-                                    xml.WriteAttributeString("E", "1");
-                                    xml.WriteAttributeString("F", "1");
-                                    xml.WriteAttributeString("I", "16");
-                                    {
-                                        xml.WriteStartElement("LSG");//Curve
-                                        xml.WriteAttributeString("A", "5"); //denotes guidance
-
-                                        for (int j = 0; j < trk.gArr[i].curvePts.Count; j++)
-                                        {
-                                            xml.WriteStartElement("PNT");//point
-                                            pn.ConvertLocalToWGS84(trk.gArr[i].curvePts[j].northing,
-                                                trk.gArr[i].curvePts[j].easting, out lat, out lon);
-                                            if (j == 0)
-                                            {
-                                                xml.WriteAttributeString("A", "6");
-                                            }
-                                            else if (j == trk.gArr[i].curvePts.Count - 1)
-                                            {
-                                                xml.WriteAttributeString("A", "7");
-                                            }
-                                            else
-                                            {
-                                                xml.WriteAttributeString("A", "9");
-                                            }
-                                            xml.WriteAttributeString("C", lat.ToString());
-                                            xml.WriteAttributeString("D", lon.ToString());
-
-                                            xml.WriteEndElement();//point
-                                        }
-                                        xml.WriteEndElement(); //end LSG curve
-                                    }
-                                    xml.WriteEndElement(); //Guide-N
-                                }
-                                xml.WriteEndElement(); //Guide-P
-                            }
-                        }
-                    }
-
-                    //Last
-                    xml.WriteEndElement();//End Field
-                }
-
-                xml.WriteEndElement();//ISO11783_TaskData Settings
-
-                xml.Flush();
-
-                //Write the XML to file and close the kml
-                xml.Close();
-
-        }
+                ISO11783_TaskFile.Export(
+                    directoryName,
+                    currentFieldDirectory,
+                    (int)(fd.areaOuterBoundary),
+                    bnd.bndList,
+                    AppModel.LocalPlane,
+                    trk,
+                    ISO11783_TaskFile.Version.V4);
+            }
             catch (Exception e)
             {
                 Log.EventWriter("Export Field as ISOXML: " + e.Message);
             }
-
-    /*
-        //xml.WriteStartElement("TSK");//Task
-        //xml.WriteAttributeString("A", "TSK1");
-        //xml.WriteAttributeString("B", "Tractor Work");
-        //xml.WriteAttributeString("C", "CTR1");
-        //xml.WriteAttributeString("E", "PFD-1");
-        //xml.WriteAttributeString("G", "1");
-        //xml.WriteAttributeString("I", "1");
-        //xml.WriteAttributeString("J", "0");
-        //xml.WriteEndElement();//Task
-    */
-
-}
+        }
 
         public void FileSaveHeadLines()
         {
@@ -1090,6 +702,8 @@ namespace AgOpenGPS
         //function to open a previously saved field, resume, open exisiting, open named field
         public void FileOpenField(string _openType)
         {
+            if (isJobStarted) FileSaveEverythingBeforeClosingField();
+
             string fileAndDirectory = "";
             if (_openType.Contains("Field.txt"))
             {
@@ -1134,12 +748,6 @@ namespace AgOpenGPS
 
             if (fileAndDirectory == "Cancel") return;
 
-            //close the existing job and reset everything
-            this.JobClose();
-
-            //and open a new job
-            this.JobNew();
-
             //Saturday, February 11, 2017  -->  7:26:52 AM
             //$FieldDir
             //Bob_Feb11
@@ -1148,7 +756,7 @@ namespace AgOpenGPS
 
             //start to read the file
             string line;
-            using (StreamReader reader = new StreamReader(fileAndDirectory))
+            using (GeoStreamReader reader = new GeoStreamReader(fileAndDirectory))
             {
                 try
                 {
@@ -1163,8 +771,6 @@ namespace AgOpenGPS
 
                     currentFieldDirectory = Path.GetDirectoryName(fileAndDirectory);
                     currentFieldDirectory = new DirectoryInfo(currentFieldDirectory).Name;
-
-                    displayFieldName = currentFieldDirectory;
 
                     //Offset header
                     line = reader.ReadLine();
@@ -1183,42 +789,24 @@ namespace AgOpenGPS
                     //start positions
                     if (!reader.EndOfStream)
                     {
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        offs = line.Split(',');
-
-                        pn.latStart = double.Parse(offs[0], CultureInfo.InvariantCulture);
-                        pn.lonStart = double.Parse(offs[1], CultureInfo.InvariantCulture);
-
-                        if (timerSim.Enabled)
-                        {
-                            pn.latitude = pn.latStart;
-                            pn.longitude = pn.lonStart;
-
-                            sim.latitude = Properties.Settings.Default.setGPS_SimLatitude = pn.latitude;
-                            sim.longitude = Properties.Settings.Default.setGPS_SimLongitude = pn.longitude;
-                            Properties.Settings.Default.Save();
-                        }
-
-                        pn.SetLocalMetersPerDegree();
+                        reader.ReadLine(); // Skip line 'StartFix'
+                        pn.DefineLocalPlane(reader.ReadWgs84(), true);
                     }
                 }
-
                 catch (Exception e)
                 {
                     Log.EventWriter("While Opening Field" + e.ToString());
 
                     TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
-
-                    
-                    JobClose();
                     return;
                 }
             }
 
-            // Tracks -------------------------------------------------------------------------------------------------
+            //and open a new job
+            this.JobNew();
 
-            trk.gArr?.Clear();
+
+            // Tracks -------------------------------------------------------------------------------------------------
 
             FileLoadTracks();
 
@@ -1570,6 +1158,7 @@ namespace AgOpenGPS
                                     }
                                 }
                             }
+                            else break;
                         }
                     }
 
@@ -1786,11 +1375,7 @@ namespace AgOpenGPS
                         if (File.Exists(fileAndDirectory))
                         {
                             var bitmap = new Bitmap(Image.FromFile(fileAndDirectory));
-
-                            GL.BindTexture(TextureTarget.Texture2D, texture[(int)textures.bingGrid]);
-                            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                            bitmap.UnlockBits(bitmapData);
+                            worldGrid.BingBitmap = bitmap;
                         }
                         else
                         {
@@ -1848,7 +1433,9 @@ namespace AgOpenGPS
                 writer.WriteLine("0");
 
                 writer.WriteLine("StartFix");
-                writer.WriteLine(pn.latitude.ToString(CultureInfo.InvariantCulture) + "," + pn.longitude.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine(
+                    AppModel.CurrentLatLon.Latitude.ToString(CultureInfo.InvariantCulture) + "," +
+                    AppModel.CurrentLatLon.Longitude.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -1893,7 +1480,9 @@ namespace AgOpenGPS
                 writer.WriteLine("0");
 
                 writer.WriteLine("StartFix");
-                writer.WriteLine(pn.latitude.ToString(CultureInfo.InvariantCulture) + "," + pn.longitude.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine(
+                    AppModel.CurrentLatLon.Latitude.ToString(CultureInfo.InvariantCulture) + "," +
+                    AppModel.CurrentLatLon.Longitude.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteLine("Latitude,Longitude,Elevation,Quality,Easting,Northing,Heading,Roll");
             }
@@ -2316,15 +1905,6 @@ namespace AgOpenGPS
             }
         }
 
-        public void FileSaveSystemEvents()
-        {
-            using (StreamWriter writer = new StreamWriter(Path.Combine(RegistrySettings.logsDirectory, "AgOpenGPS_Events_Log.txt"), true))
-            {
-                writer.Write(Log.sbEvents);
-                Log.sbEvents.Clear();
-            }
-        }
-
         //public void FileSaveMissedEvents()
         //{
         //    using (StreamWriter writer = new StreamWriter(Path.Combine(logsDirectory, "Missed_Events_Log.txt"), true))
@@ -2347,10 +1927,7 @@ namespace AgOpenGPS
         //generate KML file from flag
         public void FileSaveSingleFlagKML2(int flagNumber)
         {
-            double lat = 0;
-            double lon = 0;
-
-            pn.ConvertLocalToWGS84(flagPts[flagNumber - 1].northing, flagPts[flagNumber - 1].easting, out lat, out lon);
+            Wgs84 latLon = AppModel.LocalPlane.ConvertGeoCoordToWgs84(flagPts[flagNumber - 1].GeoCoord);
 
             //get the directory and make sure it exists, create if not
             string directoryName = Path.Combine(RegistrySettings.fieldsDirectory, currentFieldDirectory);
@@ -2365,14 +1942,12 @@ namespace AgOpenGPS
             {
                 //match new fix to current position
 
-
                 writer.WriteLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>     ");
                 writer.WriteLine(@"<kml xmlns=""http://www.opengis.net/kml/2.2""> ");
 
                 int count2 = flagPts.Count;
 
                 writer.WriteLine(@"<Document>");
-
                 writer.WriteLine(@"  <Placemark>                                  ");
                 writer.WriteLine(@"<Style> <IconStyle>");
                 if (flagPts[flagNumber - 1].color == 0)  //red - xbgr
@@ -2383,16 +1958,16 @@ namespace AgOpenGPS
                     writer.WriteLine(@"<color>ff44ffff</color>");
                 writer.WriteLine(@"</IconStyle> </Style>");
                 writer.WriteLine(@" <name> " + flagNumber.ToString(CultureInfo.InvariantCulture) + @"</name>");
-                writer.WriteLine(@"<Point><coordinates> " +
-                                lon.ToString(CultureInfo.InvariantCulture) + "," + lat.ToString(CultureInfo.InvariantCulture) + ",0" +
-                                @"</coordinates> </Point> ");
+                writer.WriteLine(@"<Point><coordinates> "
+                    + latLon.Longitude.ToString(CultureInfo.InvariantCulture) + ","
+                    + latLon.Latitude.ToString(CultureInfo.InvariantCulture) + ",0"
+                    + @"</coordinates> </Point> ");
                 writer.WriteLine(@"  </Placemark>                                 ");
                 writer.WriteLine(@"</Document>");
                 writer.WriteLine(@"</kml>                                         ");
-
             }
         }
-                                   
+
         //generate KML file from flag
         public void FileSaveSingleFlagKML(int flagNumber)
         {
@@ -2438,7 +2013,7 @@ namespace AgOpenGPS
         }
 
         //generate KML file from flag
-        public void FileMakeKMLFromCurrentPosition(double lat, double lon)
+        public void FileMakeKMLFromCurrentPosition(Wgs84 currentLatLon)
         {
             //get the directory and make sure it exists, create if not
             string directoryName = Path.Combine(RegistrySettings.fieldsDirectory, currentFieldDirectory);
@@ -2462,9 +2037,10 @@ namespace AgOpenGPS
                 writer.WriteLine(@"<color>ff4400ff</color>");
                 writer.WriteLine(@"</IconStyle> </Style>");
                 writer.WriteLine(@" <name> Your Current Position </name>");
-                writer.WriteLine(@"<Point><coordinates> " +
-                                lon.ToString(CultureInfo.InvariantCulture) + "," + lat.ToString(CultureInfo.InvariantCulture) + ",0" +
-                                @"</coordinates> </Point> ");
+                writer.WriteLine(@"<Point><coordinates> "
+                    + currentLatLon.Longitude.ToString(CultureInfo.InvariantCulture)+ ","
+                    + currentLatLon.Latitude.ToString(CultureInfo.InvariantCulture) + ",0"
+                    + @"</coordinates> </Point> ");
                 writer.WriteLine(@"  </Placemark>                                 ");
                 writer.WriteLine(@"</Document>");
                 writer.WriteLine(@"</kml>                                         ");
@@ -2552,12 +2128,12 @@ namespace AgOpenGPS
 
             string linePts = "";
 
-            for (int i = 0; i < trk.gArr.Count; i++)
+            foreach (CTrk track in trk.gArr)
             {
                 kml.WriteStartElement("Placemark");
                 kml.WriteElementString("visibility", "0");
 
-                kml.WriteElementString("name", trk.gArr[i].name);
+                kml.WriteElementString("name", track.name);
                 kml.WriteStartElement("Style");
 
                 kml.WriteStartElement("LineStyle");
@@ -2570,17 +2146,15 @@ namespace AgOpenGPS
                 kml.WriteElementString("tessellate", "1");
                 kml.WriteStartElement("coordinates");
 
-                linePts = pn.GetLocalToWSG84_KML(trk.gArr[i].ptA.easting - (Math.Sin(trk.gArr[i].heading) * ABLine.abLength),
-                    trk.gArr[i].ptA.northing - (Math.Cos(trk.gArr[i].heading) * ABLine.abLength));
-                linePts += pn.GetLocalToWSG84_KML(trk.gArr[i].ptA.easting + (Math.Sin(trk.gArr[i].heading) * ABLine.abLength),
-                    trk.gArr[i].ptA.northing + (Math.Cos(trk.gArr[i].heading) * ABLine.abLength));
+                GeoCoord pointA = track.ptA.ToGeoCoord();
+                GeoDir heading = new GeoDir(track.heading);
+                linePts = GetGeoCoordToWgs84_KML(pointA - ABLine.abLength * heading);
+                linePts += GetGeoCoordToWgs84_KML(pointA + ABLine.abLength * heading);
                 kml.WriteRaw(linePts);
 
                 kml.WriteEndElement(); // <coordinates>
                 kml.WriteEndElement(); // <LineString>
-
                 kml.WriteEndElement(); // <Placemark>
-
             }
             kml.WriteEndElement(); // <Folder>   
 
@@ -2608,9 +2182,9 @@ namespace AgOpenGPS
                 kml.WriteElementString("tessellate", "1");
                 kml.WriteStartElement("coordinates");
 
-                for (int j = 0; j < trk.gArr[i].curvePts.Count; j++)
+                foreach (vec3 v3 in trk.gArr[i].curvePts)
                 {
-                    linePts += pn.GetLocalToWSG84_KML(trk.gArr[i].curvePts[j].easting, trk.gArr[i].curvePts[j].northing);
+                    linePts += GetGeoCoordToWgs84_KML(v3.ToGeoCoord());
                 }
                 kml.WriteRaw(linePts);
 
@@ -2645,7 +2219,7 @@ namespace AgOpenGPS
 
             for (int j = 0; j < recPath.recList.Count; j++)
             {
-                linePts += pn.GetLocalToWSG84_KML(recPath.recList[j].easting, recPath.recList[j].northing);
+                linePts += GetGeoCoordToWgs84_KML(recPath.recList[j].AsGeoCoord);
             }
             kml.WriteRaw(linePts);
 
@@ -2736,13 +2310,13 @@ namespace AgOpenGPS
                             secPts = "";
                             for (int i = 1; i < triList.Count; i += 2)
                             {
-                                secPts += pn.GetLocalToWSG84_KML(triList[i].easting, triList[i].northing);
+                                secPts += GetGeoCoordToWgs84_KML(triList[i].ToGeoCoord());
                             }
                             for (int i = triList.Count - 1; i > 1; i -= 2)
                             {
-                                secPts += pn.GetLocalToWSG84_KML(triList[i].easting, triList[i].northing);
+                                secPts += GetGeoCoordToWgs84_KML(triList[i].ToGeoCoord());
                             }
-                            secPts += pn.GetLocalToWSG84_KML(triList[1].easting, triList[1].northing);
+                            secPts += GetGeoCoordToWgs84_KML(triList[1].ToGeoCoord());
 
                             kml.WriteRaw(secPts);
                             kml.WriteEndElement(); // <coordinates>
@@ -2776,14 +2350,9 @@ namespace AgOpenGPS
         {
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < bnd.bndList[bndNum].fenceLine.Count; i++)
+            foreach(vec3 v3 in bnd.bndList[bndNum].fenceLine)
             {
-                double lat = 0;
-                double lon = 0;
-
-                pn.ConvertLocalToWGS84(bnd.bndList[bndNum].fenceLine[i].northing, bnd.bndList[bndNum].fenceLine[i].easting, out lat, out lon);
-
-                sb.Append(lon.ToString("N7", CultureInfo.InvariantCulture) + ',' + lat.ToString("N7", CultureInfo.InvariantCulture) + ",0 ");
+                sb.Append(GetGeoCoordToWgs84_KML(v3.ToGeoCoord()));
             }
             return sb.ToString();
         }
@@ -2857,7 +2426,16 @@ namespace AgOpenGPS
 
             //Write the XML to file and close the kml
             kml.Close();
-
         }
+
+        private string GetGeoCoordToWgs84_KML(GeoCoord geoCoord)
+        {
+            Wgs84 latLon = AppModel.LocalPlane.ConvertGeoCoordToWgs84(geoCoord);
+
+            return
+                latLon.Longitude.ToString("N7", CultureInfo.InvariantCulture) + ',' +
+                latLon.Latitude.ToString("N7", CultureInfo.InvariantCulture) + ",0 ";
+        }
+
     }
 }

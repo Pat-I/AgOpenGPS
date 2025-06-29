@@ -1,4 +1,4 @@
-﻿using AgOpenGPS.Culture;
+﻿using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using System;
 using System.Windows.Forms;
@@ -20,7 +20,6 @@ namespace AgOpenGPS
 
             this.bntOK.Text = gStr.gsForNow;
             this.btnSave.Text = gStr.gsToFile;
-
             this.Text = gStr.gsSmoothABCurve;
         }
 

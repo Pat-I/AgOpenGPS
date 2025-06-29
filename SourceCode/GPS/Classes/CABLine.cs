@@ -1,4 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 
@@ -20,10 +20,7 @@ namespace AgOpenGPS
         //pure pursuit values
         public vec2 goalPointAB = new vec2(0, 0);
 
-        //List of all available ABLines
-        public CTrk refLine = new CTrk();
-
-        public double howManyPathsAway, lastHowManyPathsAway;
+        public int howManyPathsAway, lastHowManyPathsAway;
         public bool isMakingABLine;
         public bool isHeadingSameWay = true, lastIsHeadingSameWay;
 
@@ -50,17 +47,15 @@ namespace AgOpenGPS
         public string desName = "";
 
         //autosteer errors
-        public double pivotDistanceError, pivotDistanceErrorLast, pivotDerivative, pivotDerivativeSmoothed;
+        public double pivotDistanceError, pivotDistanceErrorLast, pivotDerivative;
 
         //derivative counters
         private int counter2;
 
         public double inty;
-        public double steerAngleSmoothed, pivotErrorTotal;
-        public double distSteerError, lastDistSteerError, derivativeDistError;
+        public double pivotErrorTotal;
 
         //Color tramColor = Color.YellowGreen;
-        public int tramPassEvery;
 
         //pointers to mainform controls
         private readonly FormGPS mf;
@@ -275,7 +270,7 @@ namespace AgOpenGPS
                     + ((goalPointAB.northing - pivot.northing) * Math.Sin(localHeading))));
 
                 steerAngleAB = glm.toDegrees(Math.Atan(2 * (((goalPointAB.easting - pivot.easting) * Math.Cos(localHeading))
-                    + ((goalPointAB.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase
+                    + ((goalPointAB.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.VehicleConfig.Wheelbase
                     / goalPointDistanceDSquared));
 
                 if (mf.ahrs.imuRoll != 88888)
@@ -346,8 +341,8 @@ namespace AgOpenGPS
                 GL.End();
 
                 GL.Color3(0.2f, 0.950f, 0.20f);
-                mf.font.DrawText3D(desPtA.easting, desPtA.northing, "&A");
-                mf.font.DrawText3D(desPtB.easting, desPtB.northing, "&B");
+                mf.font.DrawText3D(desPtA.easting, desPtA.northing, "&A", mf.camHeading);
+                mf.font.DrawText3D(desPtB.easting, desPtB.northing, "&B", mf.camHeading);
         }
 
         public void DrawABLines()
@@ -364,10 +359,10 @@ namespace AgOpenGPS
             //GL.Vertex3(mf.bnd.iE, mf.bnd.iN, 0.0);
             GL.End();
 
-            if (mf.font.isFontOn && !isMakingABLine)
+            if (!isMakingABLine)
             {
-                mf.font.DrawText3D(mf.trk.gArr[mf.trk.idx].ptA.easting, mf.trk.gArr[mf.trk.idx].ptA.northing, "&A");
-                mf.font.DrawText3D(mf.trk.gArr[mf.trk.idx].ptB.easting, mf.trk.gArr[mf.trk.idx].ptB.northing, "&B");
+                mf.font.DrawText3D(mf.trk.gArr[mf.trk.idx].ptA.easting, mf.trk.gArr[mf.trk.idx].ptA.northing, "&A", mf.camHeading);
+                mf.font.DrawText3D(mf.trk.gArr[mf.trk.idx].ptB.easting, mf.trk.gArr[mf.trk.idx].ptB.northing, "&B", mf.camHeading);
             }
 
             GL.PointSize(1.0f);
@@ -391,7 +386,7 @@ namespace AgOpenGPS
             double cosHL = Math.Cos(abHeading + glm.PIBy2) * (widthMinusOverlap * 0.5 - shadowOffset);
 
             //shadow
-            GL.Color4(0.5, 0.5, 0.5, 0.3);
+            GL.Color4(0.5, 0.5, 0.5, 0.2);
             GL.Begin(PrimitiveType.TriangleFan);
             {
                 GL.Vertex3(currentLinePtA.easting - sinHL, currentLinePtA.northing - cosHL, 0);
@@ -402,7 +397,7 @@ namespace AgOpenGPS
             GL.End();
 
             //shadow lines
-            GL.Color4(0.55, 0.55, 0.55, 0.3);
+            GL.Color4(0.55, 0.55, 0.55, 0.2);
             GL.LineWidth(1);
             GL.Begin(PrimitiveType.LineLoop);
             {
@@ -429,7 +424,7 @@ namespace AgOpenGPS
             GL.Vertex3(currentLinePtB.easting, currentLinePtB.northing, 0.0);
             GL.End();
 
-            if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.tool.width * -200)
+            if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.tool.width * -400)
             {
                 //get the tool offset and width
                 double toolOffset = mf.tool.offset * 2;
@@ -443,7 +438,7 @@ namespace AgOpenGPS
 
                 GL.Begin(PrimitiveType.Lines);
 
-                if (toolOffset == 0)
+                //if (toolOffset == 0)
                 {
                     for (int i = 1; i <= numGuideLines; i++)
                     {
@@ -457,7 +452,7 @@ namespace AgOpenGPS
                     //GL.Enable(EnableCap.LineStipple);
                     //GL.LineStipple(1, 0x000F);
 
-                    GL.Color4(0.19907f, 0.990f, 0.19750f, 0.6f);
+                    GL.Color4(0.19907f, 0.6f, 0.19750f, 0.6f);
                     GL.LineWidth(lineWidth);
                     GL.Begin(PrimitiveType.Lines);
 
@@ -473,37 +468,37 @@ namespace AgOpenGPS
 
 
                 }
-                else
-                {
-                    if (isHeadingSameWay)
-                    {
-                        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentLinePtA.easting, (sinHeading * (toolWidth + toolOffset)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentLinePtB.easting, (sinHeading * (toolWidth + toolOffset)) + currentLinePtB.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentLinePtA.easting, (sinHeading * (-toolWidth + toolOffset)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentLinePtB.easting, (sinHeading * (-toolWidth + toolOffset)) + currentLinePtB.northing, 0);
+                //else
+                //{
+                //    if (isHeadingSameWay)
+                //    {
+                //        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentLinePtA.easting, (sinHeading * (toolWidth + toolOffset)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentLinePtB.easting, (sinHeading * (toolWidth + toolOffset)) + currentLinePtB.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentLinePtA.easting, (sinHeading * (-toolWidth + toolOffset)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentLinePtB.easting, (sinHeading * (-toolWidth + toolOffset)) + currentLinePtB.northing, 0);
 
-                        toolWidth *= 2;
-                        GL.Vertex3((cosHeading * toolWidth) + currentLinePtA.easting, (sinHeading * toolWidth) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * toolWidth) + currentLinePtB.easting, (sinHeading * toolWidth) + currentLinePtB.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtA.easting, (sinHeading * (-toolWidth)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtB.easting, (sinHeading * (-toolWidth)) + currentLinePtB.northing, 0);
-                    }
-                    else
-                    {
-                        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentLinePtA.easting, (sinHeading * (toolWidth - toolOffset)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentLinePtB.easting, (sinHeading * (toolWidth - toolOffset)) + currentLinePtB.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentLinePtA.easting, (sinHeading * (-toolWidth - toolOffset)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentLinePtB.easting, (sinHeading * (-toolWidth - toolOffset)) + currentLinePtB.northing, 0);
+                //        toolWidth *= 2;
+                //        GL.Vertex3((cosHeading * toolWidth) + currentLinePtA.easting, (sinHeading * toolWidth) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * toolWidth) + currentLinePtB.easting, (sinHeading * toolWidth) + currentLinePtB.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtA.easting, (sinHeading * (-toolWidth)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtB.easting, (sinHeading * (-toolWidth)) + currentLinePtB.northing, 0);
+                //    }
+                //    else
+                //    {
+                //        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentLinePtA.easting, (sinHeading * (toolWidth - toolOffset)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentLinePtB.easting, (sinHeading * (toolWidth - toolOffset)) + currentLinePtB.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentLinePtA.easting, (sinHeading * (-toolWidth - toolOffset)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentLinePtB.easting, (sinHeading * (-toolWidth - toolOffset)) + currentLinePtB.northing, 0);
 
-                        toolWidth *= 2;
-                        GL.Vertex3((cosHeading * toolWidth) + currentLinePtA.easting, (sinHeading * toolWidth) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * toolWidth) + currentLinePtB.easting, (sinHeading * toolWidth) + currentLinePtB.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtA.easting, (sinHeading * (-toolWidth)) + currentLinePtA.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtB.easting, (sinHeading * (-toolWidth)) + currentLinePtB.northing, 0);
-                    }
-                    GL.End();
+                //        toolWidth *= 2;
+                //        GL.Vertex3((cosHeading * toolWidth) + currentLinePtA.easting, (sinHeading * toolWidth) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * toolWidth) + currentLinePtB.easting, (sinHeading * toolWidth) + currentLinePtB.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtA.easting, (sinHeading * (-toolWidth)) + currentLinePtA.northing, 0);
+                //        GL.Vertex3((cosHeading * (-toolWidth)) + currentLinePtB.easting, (sinHeading * (-toolWidth)) + currentLinePtB.northing, 0);
+                //    }
+                //    GL.End();
 
-                }
+                //}
                 GL.Disable(EnableCap.LineStipple);
             }
 

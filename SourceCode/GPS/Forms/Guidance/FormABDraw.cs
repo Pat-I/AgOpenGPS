@@ -1,4 +1,5 @@
-﻿using AgOpenGPS.Culture;
+﻿using AgOpenGPS.Controls;
+using AgOpenGPS.Core.Translations;
 using AgOpenGPS.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -48,6 +49,9 @@ namespace AgOpenGPS
 
         private void FormABDraw_Load(object sender, EventArgs e)
         {
+            //translate
+            this.Text = gStr.gsABDraw;
+
             originalLine = mf.trk.idx;
 
             gTemp.Clear();
@@ -197,13 +201,6 @@ namespace AgOpenGPS
             Properties.Settings.Default.Save();
         }
 
-        private void btnCenterOGL_Click(object sender, EventArgs e)
-        {
-            zoom = 1;
-            sX = 0;
-            sY = 0;
-            zoomToggle = false;
-        }
         private void cboxIsZoom_CheckedChanged(object sender, EventArgs e)
         {
             zoomToggle = false;
@@ -314,12 +311,6 @@ namespace AgOpenGPS
             else cboxIsVisible.Image = Properties.Resources.TracksInvisible;
         }
 
-        private void nudDistance_Click(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NudlessNumericUpDown)sender, this);
-            btnSelectCurve.Focus();
-        }
-
         private void btnDeleteCurve_Click(object sender, EventArgs e)
         {
             if (indx > -1)
@@ -363,7 +354,7 @@ namespace AgOpenGPS
 
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((System.Windows.Forms.TextBox)sender, this);
+                ((System.Windows.Forms.TextBox)sender).ShowKeyboard(this);
                 
                 if (indx > -1)
                     gTemp[indx].name = tboxNameCurve.Text.Trim();
