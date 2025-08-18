@@ -23,12 +23,12 @@ namespace AgOpenGPS.Core
         // Deprecated: Only here to avoid numerous changes to existing code.
         // Beware: the name suggests that this always has a positive value, but it is always negative!
         // Please use DistanceToLookAt instead
-        public double camSetDistance => - 2.0 * DistanceToLookAt;
+        public double camSetDistance => -2.0 * DistanceToLookAt;
 
         public void SetLookAt(double lookAtX, double lookAtY, double directionHintInDegrees)
         {
             //back the camera up
-            GLW.Translate(0,0, - DistanceToLookAt);
+            GLW.Translate(0, 0, -DistanceToLookAt);
 
             GLW.RotateX(PitchInDegrees);
             GLW.Translate(PanX, PanY);

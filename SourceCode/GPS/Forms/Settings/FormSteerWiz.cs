@@ -320,7 +320,7 @@ namespace AgOpenGPS
                     {
                         hsbarAckerman.Value = 100;
                         lblAckermannError.Text = "Error, Ackermann set to 100";
-                        Log.EventWriter("Error, Ackermann set to 100"+ eh.ToString());
+                        Log.EventWriter("Error, Ackermann set to 100" + eh.ToString());
                     }
                 }
             }

@@ -8,7 +8,6 @@ namespace AgOpenGPS
 {
     public class CNMEA
     {
-        
         //our current fix
         public vec2 fix = new vec2(0, 0);
 

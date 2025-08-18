@@ -118,7 +118,7 @@ namespace AgOpenGPS
 
             if (xTE <= 0.1)
             {
-                goalPointDistance *= LoekiAheadHold; 
+                goalPointDistance *= LoekiAheadHold;
                 goalPointDistance += LoekiAheadHold;
             }
 
@@ -129,12 +129,12 @@ namespace AgOpenGPS
                 LoekiAheadHold = (1 - (xTE / 0.3)) * (LoekiAheadHold - LoekiAheadAcquire);
                 LoekiAheadHold += LoekiAheadAcquire;
 
-                goalPointDistance *= LoekiAheadHold; 
+                goalPointDistance *= LoekiAheadHold;
                 goalPointDistance += LoekiAheadHold;
             }
             else
             {
-                goalPointDistance *= LoekiAheadAcquire; 
+                goalPointDistance *= LoekiAheadAcquire;
                 goalPointDistance += LoekiAheadAcquire;
             }
 
@@ -151,7 +151,7 @@ namespace AgOpenGPS
             if (mf.isFirstHeadingSet && !mf.tool.isToolFrontFixed)
             {
                 // Draw the rigid hitch
-               XyCoord[] vertices;
+                XyCoord[] vertices;
                 if (!mf.tool.isToolRearFixed)
                 {
                     vertices = new XyCoord[] {
@@ -174,7 +174,7 @@ namespace AgOpenGPS
             //draw the vehicle Body
             if (!mf.isFirstHeadingSet && mf.headingFromSource != "Dual")
             {
-                GL.Color4(1,1,1, 0.75);
+                GL.Color4(1, 1, 1, 0.75);
                 mf.ScreenTextures.QuestionMark.Draw(new XyCoord(1.0, 5.0), new XyCoord(5.0, 1.0));
             }
 
@@ -188,7 +188,7 @@ namespace AgOpenGPS
                     GLW.SetColor(vehicleColor);
 
                     AckermannAngles(
-                        - (mf.timerSim.Enabled ? mf.sim.steerangleAve : mf.mc.actualSteerAngleDegrees),
+                        -(mf.timerSim.Enabled ? mf.sim.steerangleAve : mf.mc.actualSteerAngleDegrees),
                         out double leftAckermann,
                         out double rightAckermann);
                     XyCoord tractorCenter = new XyCoord(0.0, 0.5 * VehicleConfig.Wheelbase);
@@ -237,7 +237,7 @@ namespace AgOpenGPS
 
                     //Left Wheel
                     GL.PushMatrix();
-                    GL.Translate(- VehicleConfig.TrackWidth * 0.5, -VehicleConfig.Wheelbase, 0);
+                    GL.Translate(-VehicleConfig.TrackWidth * 0.5, -VehicleConfig.Wheelbase, 0);
                     GL.Rotate(leftAckermannAngle, 0, 0, 1);
                     mf.VehicleTextures.FrontWheel.DrawCenteredAroundOrigin(forntWheelDelta);
                     GL.PopMatrix();
@@ -295,7 +295,7 @@ namespace AgOpenGPS
                 PointStyle antennaBackgroundStyle = new PointStyle(16, Colors.Black);
                 PointStyle antennaForegroundStyle = new PointStyle(10, Colors.AntennaColor);
                 PointStyle[] layerStyles = { antennaBackgroundStyle, antennaForegroundStyle };
-                GLW.DrawPointLayered(layerStyles , - VehicleConfig.AntennaOffset, VehicleConfig.AntennaPivot, 0.1);
+                GLW.DrawPointLayered(layerStyles, -VehicleConfig.AntennaOffset, VehicleConfig.AntennaPivot, 0.1);
             }
 
             if (mf.bnd.isBndBeingMade && mf.bnd.isDrawAtPivot)

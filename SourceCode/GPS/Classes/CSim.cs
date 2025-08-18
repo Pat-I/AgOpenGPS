@@ -86,7 +86,7 @@ namespace AgOpenGPS
             mf.pn.hdop = 0.7;
 
             mf.pn.altitude = SimulateAltitude(mf.AppModel.CurrentLatLon);
-            
+
             mf.pn.satellitesTracked = 12;
 
             mf.sentenceCounter = 0;

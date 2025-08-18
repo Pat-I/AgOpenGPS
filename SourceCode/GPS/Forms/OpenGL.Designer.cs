@@ -1,14 +1,14 @@
-﻿using System;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using System.Windows.Forms;
-using System.Text;
-using System.Drawing;
-using AgLibrary.Logging;
+﻿using AgLibrary.Logging;
 using AgOpenGPS.Core.Drawing;
 using AgOpenGPS.Core.DrawLib;
 using AgOpenGPS.Core.Models;
 using AgOpenGPS.Properties;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using System;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -287,7 +287,7 @@ namespace AgOpenGPS
                                     if (isDay) GL.Color4(tool.secColors[j].R, tool.secColors[j].G, tool.secColors[j].B, (byte)152);
                                     else GL.Color4(tool.secColors[j].R, tool.secColors[j].G, tool.secColors[j].B, (byte)(76));
                                 }
-                                patchCount = triStrip[j].patchList.Count-1;
+                                patchCount = triStrip[j].patchList.Count - 1;
 
                                 if (patchCount > -1)
                                 {
@@ -441,7 +441,7 @@ namespace AgOpenGPS
                         {
                             PointStyle backgroundPointStyle = new PointStyle(12.0f, Colors.Black);
                             PointStyle foregroundPointStyle = new PointStyle(6.0f, Colors.GoalPointColor);
-                            PointStyle[] pointStyles = { backgroundPointStyle, foregroundPointStyle};
+                            PointStyle[] pointStyles = { backgroundPointStyle, foregroundPointStyle };
                             vec2 goalPoint = trk.gArr[trk.idx].mode == TrackMode.AB ? ABLine.goalPointAB : curve.goalPointCu;
                             GLW.DrawPointLayered(pointStyles, goalPoint.easting, goalPoint.northing, 0.0);
                         }
@@ -495,6 +495,7 @@ namespace AgOpenGPS
                     {
                         if (pn.fixQuality != 4)
                         {
+                            // LOST: raise alarm (existing behavior) and arm "recovered" for next time
                             if (!sounds.isRTKAlarming)
                             {
                                 if (isRTK_KillAutosteer && isBtnAutoSteerOn)
@@ -504,15 +505,47 @@ namespace AgOpenGPS
                                     Log.EventWriter("Autosteer Off, RTK Fix Alarm");
                                 }
 
-                                Log.EventWriter("RTK Alarm Fix is Lost");
+                                Log.EventWriter("RTK Alarm: Fix lost");
                                 sounds.sndRTKAlarm.Play();
                             }
+
                             sounds.isRTKAlarming = true;
+                            sounds.RTKWasAlarming = true;
+                            RTKBackSinceUtc = DateTime.MinValue; // reset since we are not fixed
                             DrawLostRTK();
                         }
-                        else
+                        else // pn.fixQuality == 4
                         {
+                            // FIXED: clear alarm flag
                             sounds.isRTKAlarming = false;
+
+                            // If we were alarming, detect a *recovered* edge with debounce
+                            if (sounds.RTKWasAlarming)
+                            {
+                                if (RTKBackSinceUtc == DateTime.MinValue)
+                                {
+                                    // first frame we see 4 after a loss -> start debounce timer
+                                    RTKBackSinceUtc = DateTime.UtcNow;
+                                }
+                                else
+                                {
+                                    var stableMs = (DateTime.UtcNow - RTKBackSinceUtc).TotalMilliseconds;
+                                    if (stableMs >= RTK_RECOVER_DEBOUNCE_MS)
+                                    {
+                                        // One-shot "recovered" event
+                                        Log.EventWriter("RTK Fix Recovered");
+                                        sounds.sndRTKRecoverd.Play();
+
+                                        sounds.RTKWasAlarming = false;
+                                        RTKBackSinceUtc = DateTime.MinValue;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Normal fixed state, nothing to do
+                                RTKBackSinceUtc = DateTime.MinValue;
+                            }
                         }
                     }
 
@@ -525,10 +558,17 @@ namespace AgOpenGPS
                         DrawVersion("Beta Testing v" + Program.SemVer);
                     }
 
+                    if (bnd.isHeadlandOn && isHeadlandDistanceOn)
+                    {
+                        DrawHeadlandDistance();
+                    }
+
+
                     if (pn.age > pn.ageAlarm) DrawAge();
 
                     //at least one track
                     if (guideLineCounter > 0) DrawGuidanceLineText();
+
 
                     //if hardware messages
                     if (isHardwareMessages) DrawHardwareMessageText();
@@ -634,7 +674,7 @@ namespace AgOpenGPS
                 deadCam += 5;
 
                 GL.Color4(1.25f, 1.25f, 1.275f, 0.75);
-                ScreenTextures.NoGps.DrawCenteredAroundOrigin(new XyDelta(2.5, - 2.5));
+                ScreenTextures.NoGps.DrawCenteredAroundOrigin(new XyDelta(2.5, -2.5));
 
                 // 2D Ortho ---------------------------------------////////-------------------------------------------------
 
@@ -1946,81 +1986,116 @@ namespace AgOpenGPS
             catch { }
         }
 
-        public double avgPivDistance, lightbarDistance, longAvgPivDistance;
+        // Helper: draw a single arrow as a triangle, with optional halo ---
 
-        private void DrawLightBar(double Width, double Height, double offlineDistance)
+        public double avgPivDistance, lightbarDistance, longAvgPivDistance;
+        private void DrawArrowTriangle(double cx, double cy, double size, bool isRight)
         {
-            double down = 25;
+            double s = size;
+            GL.Begin(PrimitiveType.Triangles);
+            if (isRight)
+            {
+                // '>' : base on left, tip on right
+                GL.Vertex2(cx - s, cy - s);
+                GL.Vertex2(cx - s, cy + s);
+                GL.Vertex2(cx + s, cy);
+            }
+            else
+            {
+                // '<' : base on right, tip on left
+                GL.Vertex2(cx + s, cy - s);
+                GL.Vertex2(cx + s, cy + s);
+                GL.Vertex2(cx - s, cy);
+            }
+            GL.End();
+        }
+
+        private void DrawLightBar(double width, double height, double offlineDistance)
+        {
+            const int spacing = 32;
+            const int dotsPerSide = 12;
+            const double down = 25.0;
+
+            const double arrowSizeFill = 10.0;
+            const double arrowSizeHalo = 16.0;
+
             GL.LineWidth(1);
-            //GL.Translate(0, 0, 0.01);
-            //offlineDistance *= -1;
-            //  Dot distance is representation of how far from AB Line
-            int dotDistance = (int)(offlineDistance);
-            int limit = (int)lightbarCmPerPixel * 8;
+
+            // Compute center gap so text background has space
+            double wide = width / 18.0;
+            if (wide < 64) wide = 64;
+            double margin = 20.0; // extra spacing in the center
+            double desiredInner = wide + margin;
+            double currentInner = 2 * spacing;
+            double shift = Math.Max(0.0, desiredInner - currentInner);
+
+            // Clamp offline distance
+            int dotDistance = (int)offlineDistance;
+            int limit = (int)(lightbarCmPerPixel * dotsPerSide);
             if (dotDistance < -limit) dotDistance = -limit;
             if (dotDistance > limit) dotDistance = limit;
 
-            //if (dotDistance < -10) dotDistance -= 30;
-            //if (dotDistance > 10) dotDistance += 30;
-
-            // dot background
+            // Background rail (small dark points)
             GL.PointSize(8.0f);
-            GL.Color3(0.00f, 0.0f, 0.0f);
+            GL.Color3(0.00, 0.0, 0.0);
             GL.Begin(PrimitiveType.Points);
-            for (int i = -8; i < -1; i++) GL.Vertex2((i * 32), down);
-            for (int i = 2; i < 9; i++) GL.Vertex2((i * 32), down);
+            for (int i = -dotsPerSide; i < -1; i++) GL.Vertex2((i * spacing) - shift, down);   // left rail
+            for (int i = 2; i < dotsPerSide + 1; i++) GL.Vertex2((i * spacing) + shift, down); // right rail
             GL.End();
 
-            GL.PointSize(4.0f);
+            GL.PushMatrix();
             GL.Translate(0, 0, 0.01);
 
-            //red left side
-            GL.Color3(0.750f, 0.0f, 0.0f);
-            GL.Begin(PrimitiveType.Points);
-            for (int i = -8; i < -1; i++) GL.Vertex2((i * 32), down);
-
-            //green right side
-            GL.Color3(0.0f, 0.750f, 0.0f);
-            for (int i = 2; i < 9; i++) GL.Vertex2((i * 32), down);
-            GL.End();
-
-            //Are you on the right side of line? So its green.
-            if ((offlineDistance) < 0.0)
+            if (offlineDistance < 0.0)
             {
-                int dots = (dotDistance * -1 / lightbarCmPerPixel) + 1;
+                // Right/green side (negative = right correction)
+                int lit = (-dotDistance / lightbarCmPerPixel) + 1;
+                if (lit < 0) lit = 0;
+                lit = Math.Min(lit, dotsPerSide + 1);
 
-                GL.PointSize(24.0f);
+                // HALO first
                 GL.Color3(0.0f, 0.0f, 0.0f);
-                GL.Begin(PrimitiveType.Points);
-                for (int i = 2; i < dots + 1; i++) GL.Vertex2((i * 32), down);
-                GL.End();
+                for (int i = 2; i < lit + 1; i++)
+                {
+                    double cx = (i * spacing) + shift;
+                    DrawArrowTriangle(cx, down, arrowSizeHalo, true);
+                }
 
-                GL.PointSize(16.0f);
+                // FILL
                 GL.Color3(0.0f, 0.980f, 0.0f);
-                GL.Begin(PrimitiveType.Points);
-                for (int i = 1; i < dots; i++) GL.Vertex2((i * 32 + 32), down);
-                GL.End();
-                //return;
+                for (int i = 1; i < lit; i++)
+                {
+                    double cx = (i * spacing + spacing) + shift;
+                    DrawArrowTriangle(cx, down, arrowSizeFill, true);
+                }
             }
-
-            else //red side
+            else
             {
-                int dots = (int)(dotDistance / lightbarCmPerPixel) + 1;
+                // Left/red side (positive = left correction)
+                int lit = (dotDistance / lightbarCmPerPixel) + 1;
+                if (lit < 0) lit = 0;
+                lit = Math.Min(lit, dotsPerSide + 1);
 
-                GL.PointSize(24.0f);
+                // HALO first
                 GL.Color3(0.0f, 0.0f, 0.0f);
-                GL.Begin(PrimitiveType.Points);
-                for (int i = 2; i < dots + 1; i++) GL.Vertex2((i * -32), down);
-                GL.End();
+                for (int i = 2; i < lit + 1; i++)
+                {
+                    double cx = (i * -spacing) - shift;
+                    DrawArrowTriangle(cx, down, arrowSizeHalo, false);
+                }
 
-                GL.PointSize(16.0f);
+                // FILL
                 GL.Color3(0.980f, 0.30f, 0.0f);
-                GL.Begin(PrimitiveType.Points);
-                for (int i = 1; i < dots; i++) GL.Vertex2((i * -32 - 32), down);
-                GL.End();
-                //return;
+                for (int i = 1; i < lit; i++)
+                {
+                    double cx = (i * -spacing - spacing) - shift;
+                    DrawArrowTriangle(cx, down, arrowSizeFill, false);
+                }
             }
+
+            GL.PopMatrix();
         }
+
 
         private void DrawLightBarText()
         {
@@ -2028,70 +2103,81 @@ namespace AgOpenGPS
 
             if (ct.isContourBtnOn || trk.idx > -1 || recPath.isDrivingRecordedPath)
             {
-
-                // in millimeters
+                // EWMA of cross-track in mm (fast/visual smoothing)
                 avgPivDistance = avgPivDistance * 0.5 + lightbarDistance * 0.5;
 
-                if (avgPivDistance > 150) longAvgPivDistance = 150;
-                longAvgPivDistance = longAvgPivDistance * 0.97 + Math.Abs(avgPivDistance) * 0.03;
+                // Low-pass of absolute error in mm (for the small secondary text)
+                longAvgPivDistance = longAvgPivDistance * 0.98 + Math.Abs(avgPivDistance) * 0.02;
+                if (longAvgPivDistance > 150) longAvgPivDistance = 150; // cap AFTER filter to keep smoothing effective
 
+                // Convert to display units: cm (metric) or inch (imperial)
                 double avgPivotDistance = avgPivDistance * (isMetric ? 0.1 : 0.03937);
 
+                // Keep geometry identical to SteerBarText
+                double textSize = (100.0 + (oglMain.Height - 600.0)) * 0.0012;
+                int wide = (int)(oglMain.Width / 18.0);
+                if (wide < 64) wide = 64;
+
+                // Draw the dot-rail LightBar using the same sizing
                 if (isLightbarOn) DrawLightBar(oglMain.Width, oglMain.Height, avgPivotDistance);
 
+                // Clamp display range for the main label
                 if (avgPivotDistance > 999) avgPivotDistance = 999;
                 if (avgPivotDistance < -999) avgPivotDistance = -999;
 
-
-                string hede = ".0.";
-
-                if (avgPivotDistance > 0.99)
+                // Build label just like SteerBar: near-zero shows "> 0 <", otherwise show magnitude + direction
+                string hede;
+                if (Math.Abs(avgPivotDistance) < 0.9999)
                 {
-                    //GL.Color3(0.9752f, 0.50f, 0.3f);
-                    hede = (Math.Abs(avgPivotDistance)).ToString("N0");
+                    hede = "> 0 <";
                 }
-                else if (avgPivotDistance < -0.99)
+                else
                 {
-                    //GL.Color3(0.50f, 0.952f, 0.3f);
-                    hede = (Math.Abs(avgPivotDistance)).ToString("N0");
+                    hede = (avgPivotDistance < 0)
+                        ? (Math.Abs(avgPivotDistance)).ToString("N0") + " >"  // negative → right correction
+                        : "< " + (Math.Abs(avgPivotDistance)).ToString("N0"); // positive → left correction
                 }
 
-                int center = -(int)(((double)(hede.Length) * 0.5) * 22);
+                // Center based on actual string length and SteerBar font metrics
+                int center = -(int)((hede.Length * 0.5) * (18 * (1.0 + textSize)));
 
+                // Dynamic color (same logic you already use)
                 double green = Math.Abs(avgPivDistance);
                 double red = green;
                 if (green > 400) green = 400;
-                green *= .001;
-                green = (0.4 - green) + 0.58;
-
+                green = (0.4 - (green * 0.001)) + 0.58;
                 if (red > 400) red = 400;
                 red = 0.002 * red;
 
                 GL.Color4(red, green, 0.3, 1.0);
 
-                //int wide = (int)((double)oglMain.Width / 12);
-                //if (wide < 75) wide = 75;
-                int wide = 50;
-
-                XyCoord u0v0 = new XyCoord(-wide, 2);
-                XyCoord u1v1 = new XyCoord(wide, 50);
+                // Background rectangle IDENTICAL to SteerBarText
+                XyCoord u0v0 = new XyCoord(-wide, 35 * (1 + textSize));
+                XyCoord u1v1 = new XyCoord(wide, 3);
                 ScreenTextures.CrossTrackBackground.Draw(u0v0, u1v1);
 
-                GL.Color4(0.0, 0.0, 0.0, 1.0);
-                font.DrawText(center, 2, hede, 1.5);
+                // Main text (distance + arrows)
+                GL.Color4(0.12f, 0.12770f, 0.120f, 1);
+                font.DrawText(center, 2, hede, 1.0 + textSize);
 
+                // Secondary small line: long-term average (only when small)
                 if (longAvgPivDistance < 150)
                 {
-                    hede = (Math.Abs(longAvgPivDistance * (isMetric ? 0.1 : 0.03937))).ToString("N1");
-
+                    string small = (Math.Abs(longAvgPivDistance * (isMetric ? 0.1 : 0.03937))).ToString("N1");
                     GL.Color3(0.950f, 0.952f, 0.3f);
-                    center = -(int)(((double)(hede.Length) * 0.5) * 16);
-                    font.DrawText(center, 45, hede, 1);
+                    int centerSmall = -(int)((small.Length * 0.5) * 16);
+                    font.DrawText(centerSmall, (int)(45 * (1.0 + 0.2 * textSize)) + 10, small, 1.0);
                 }
 
+                // Optional: same top line indicator as SteerBar when in dead-zone
                 if (vehicle.isInDeadZone)
                 {
-
+                    GL.Color4(0.512f, 0.9712770f, 0.5120f, 1);
+                    GL.LineWidth(4);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex2(-wide, 36 * (1 + textSize));
+                    GL.Vertex2(wide, 36 * (1 + textSize));
+                    GL.End();
                 }
             }
         }
@@ -2320,7 +2406,7 @@ namespace AgOpenGPS
 
                 //hide show bottom menu
                 int hite = oglMain.Height - 30;
-                XyCoord menuShowHideCoord = new XyCoord(center, hite -32);
+                XyCoord menuShowHideCoord = new XyCoord(center, hite - 32);
                 ScreenTextures.MenuShowHide.Draw(menuShowHideCoord, menuShowHideCoord + sizeDelta);
 
                 center += 50;
@@ -2465,7 +2551,7 @@ namespace AgOpenGPS
             else GL.Color3(0.952f, 0.0f, 0.0f);
 
             GL.Rotate(angle, 0, 0, 1);
-            ScreenTextures.SpeedoNeedle.DrawCenteredAroundOrigin(new XyDelta(48 ,48));
+            ScreenTextures.SpeedoNeedle.DrawCenteredAroundOrigin(new XyDelta(48, 48));
 
             GL.PopMatrix();
         }
@@ -2499,6 +2585,102 @@ namespace AgOpenGPS
                     lblGuidanceLine.Visible = false;
                 }
             }
+        }
+
+        // Draw the headland distance at a fixed screen position (not scaling with window size)
+        private void DrawHeadlandDistance()
+        {
+            // --- Fixed anchor (pixels) ---
+            const int anchorCenterX = -20;   // horizontal center of the icon+text block
+            const int anchorTopY = 160;    // top Y of the icon row
+
+            // Text size (kept local here)
+            const double textSize = 1.2;
+
+            // Build the label text
+            string label = bnd.HeadlandDistance.HasValue
+                ? bnd.HeadlandDistance.Value.ToString("0.0") + " M"
+                : "--";
+
+            // Rough text width estimate (scaled with text size for better centering)
+            const double charWidth = 6.5;
+            double textWidth = label.Length * charWidth * textSize;
+
+            double iconWidth = 42.0;
+            double iconHeight = 42.0;
+            double spacing = 8.0;
+            double totalWidth = iconWidth + spacing + textWidth;
+
+            // Position: center the whole block around anchorCenterX; Y stays fixed
+            double xStart = anchorCenterX - totalWidth / 2.0;
+            double yTop = anchorTopY;
+
+            // Decide light/dark icon by sampling the actual GL background under the icon
+            bool useLight = UseLightIconBySampling((int)xStart, (int)yTop, (int)iconWidth, (int)iconHeight);
+            Texture2D iconTexture = useLight ? ScreenTextures.HeadlandLight : ScreenTextures.HeadlandDark;
+
+            // Draw icon (centered around its own rect)
+            GL.Color3(1.0f, 1.0f, 1.0f);
+            GL.PushMatrix();
+            GL.Translate(xStart + iconWidth / 2.0, yTop + iconHeight / 2.0, 0);
+            iconTexture.DrawCenteredAroundOrigin(new XyDelta(iconWidth, iconHeight));
+            GL.PopMatrix();
+
+            // Text position next to the icon
+            double textX = xStart + iconWidth + spacing + 10;
+
+            // Color: green if > 20 m, otherwise orange
+            if (bnd.HeadlandDistance.HasValue && bnd.HeadlandDistance.Value > 20.0)
+                GL.Color3(0.0f, 0.9f, 0.0f);
+            else
+                GL.Color3(1.0f, 1.0f, 0.0f);
+
+            // Draw the text slightly below icon top for a nicer baseline
+            font.DrawText((int)textX, (int)(yTop), label, textSize);
+        }
+
+
+        /// <summary>
+        /// Decide whether to use a light icon by sampling a small pixel area under the icon.
+        /// Returns true for dark background (use light icon), false for light background (use dark icon).
+        /// </summary>
+        private bool UseLightIconBySampling(int x, int yTop, int w, int h)
+        {
+            // Sample a tiny 8x8 block around the center of the icon
+            const int sampleSize = 8;
+            int centerX = x + w / 2;
+            int centerY_TopOrigin = yTop + h / 2;
+
+            // OpenGL's ReadPixels origin is bottom-left; convert from top-origin coordinates
+            int readX = Math.Max(0, centerX - sampleSize / 2);
+            int readY = Math.Max(0, oglMain.Height - centerY_TopOrigin - sampleSize / 2);
+            int maxW = Math.Min(sampleSize, oglMain.Width - readX);
+            int maxH = Math.Min(sampleSize, oglMain.Height - readY);
+            if (maxW <= 0 || maxH <= 0) return false; // fallback: assume light background → use dark icon
+
+            // Read pixels (BGRA order when using PixelFormat.Bgra)
+            byte[] buffer = new byte[maxW * maxH * 4];
+            // If you have a System.Drawing.PixelFormat in scope, fully qualify the OpenGL one:
+            // using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+            GL.ReadPixels(readX, readY, maxW, maxH,
+                          OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+                          PixelType.UnsignedByte, buffer);
+
+            // Compute average luma (BT.601): Y ≈ 0.299R + 0.587G + 0.114B
+            double sum = 0;
+            for (int i = 0; i < buffer.Length; i += 4)
+            {
+                byte b = buffer[i + 0];
+                byte g = buffer[i + 1];
+                byte r = buffer[i + 2];
+                // byte a = buffer[i + 3]; // not needed
+                double y601 = 0.299 * r + 0.587 * g + 0.114 * b;
+                sum += y601;
+            }
+            double avg = sum / (buffer.Length / 4);
+
+            // Threshold around mid-gray; tune if needed (e.g., 140–155 depending on your visuals)
+            return avg < 140.0; // dark background → use light icon
         }
 
         private void DrawHardwareMessageText()

@@ -2,6 +2,7 @@
 using AgOpenGPS.Controls;
 using AgOpenGPS.Core.Models;
 using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Forms;
 using AgOpenGPS.Helpers;
 using System;
 using System.Globalization;
@@ -64,8 +65,10 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private async void btnSave_Click(object sender, EventArgs e)
         {
+            if (mf.isJobStarted)
+                await mf.FileSaveEverythingBeforeClosingField();
 
             //reset sim and world to kml position
             CreateNewField();
@@ -105,7 +108,7 @@ namespace AgOpenGPS
             {
                 tboxFieldName.Text = System.IO.Path.GetFileNameWithoutExtension(ofd.FileName);
             }
-            fileName= ofd.FileName;
+            fileName = ofd.FileName;
             //get lat and lon from boundary in kml
             FindLatLon(fileName);
 
@@ -149,12 +152,12 @@ namespace AgOpenGPS
                                 if (endIndex == -1)
                                 {
                                     //just add the line
-                                    if (startIndex == -1) coordinates += line.Substring(0);
+                                    if (startIndex == -1) coordinates += " " + line.Substring(0);
                                     else coordinates += line.Substring(startIndex + 13);
                                 }
                                 else
                                 {
-                                    if (startIndex == -1) coordinates += line.Substring(0, endIndex);
+                                    if (startIndex == -1) coordinates += " " + line.Substring(0, endIndex);
                                     else coordinates += line.Substring(startIndex + 13, endIndex - (startIndex + 13));
                                     break;
                                 }
@@ -204,7 +207,8 @@ namespace AgOpenGPS
                             break;
                         }
                     }
-                    if(fieldCreated) { 
+                    if (fieldCreated)
+                    {
                         mf.FileSaveBoundary();
                         mf.bnd.BuildTurnLines();
                         mf.fd.UpdateFieldBoundaryGUIAreas();
@@ -223,7 +227,7 @@ namespace AgOpenGPS
                     return;
                 }
             }
-             
+
             mf.bnd.isOkToAddPoints = false;
         }
 
@@ -252,12 +256,12 @@ namespace AgOpenGPS
                                 if (endIndex == -1)
                                 {
                                     //just add the line
-                                    if (startIndex == -1) coordinates += line.Substring(0);
+                                    if (startIndex == -1) coordinates += " " + line.Substring(0);
                                     else coordinates += line.Substring(startIndex + 13);
                                 }
                                 else
                                 {
-                                    if (startIndex == -1) coordinates += line.Substring(0, endIndex);
+                                    if (startIndex == -1) coordinates += " " + line.Substring(0, endIndex);
                                     else coordinates += line.Substring(startIndex + 13, endIndex - (startIndex + 13));
                                     break;
                                 }
@@ -340,7 +344,7 @@ namespace AgOpenGPS
                 //create it for first save
                 if ((!string.IsNullOrEmpty(directoryName)) && (Directory.Exists(directoryName)))
                 {
-                    MessageBox.Show(gStr.gsChooseADifferentName, gStr.gsDirectoryExists, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    FormDialog.Show(gStr.gsChooseADifferentName, gStr.gsDirectoryExists, MessageBoxButtons.OK);
                     return;
                 }
                 else
@@ -402,7 +406,7 @@ namespace AgOpenGPS
             {
                 Log.EventWriter("Creating new kml field " + ex.ToString());
 
-                MessageBox.Show(gStr.gsError, ex.ToString());
+                FormDialog.Show(gStr.gsError, ex.ToString(), MessageBoxButtons.OK);
                 mf.currentFieldDirectory = "";
             }
         }

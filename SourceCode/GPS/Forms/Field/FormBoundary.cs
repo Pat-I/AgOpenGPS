@@ -1,18 +1,23 @@
 using AgLibrary.Logging;
+using AgOpenGPS.Classes;
 using AgOpenGPS.Core.Models;
 using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Forms.Field;
+using AgOpenGPS.Forms;
 using AgOpenGPS.Helpers;
 using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+using System.Runtime.CompilerServices;
 
 namespace AgOpenGPS
 {
     public partial class FormBoundary : Form
     {
         private readonly FormGPS mf = null;
+
 
         private double latK, lonK;
         private int fenceSelected = -1;
@@ -37,7 +42,7 @@ namespace AgOpenGPS
 
         private void FormBoundary_Load(object sender, EventArgs e)
         {
-            this.Size = new Size(600,300);
+            this.Size = new Size(600, 300);
 
             //update the list view with real data
             UpdateChart();
@@ -202,23 +207,26 @@ namespace AgOpenGPS
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
+            // Show custom confirmation dialog for full boundary deletion
+            DialogResult result3 = FormDialog.Show(
+                gStr.gsCompletelyDeleteBoundary,
                 gStr.gsDeleteForSure,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2);
+                MessageBoxButtons.YesNo);
 
-            if (result3 == DialogResult.Yes)
+            if (result3 == DialogResult.OK)
             {
                 btnDelete.Enabled = false;
 
                 if (mf.bnd.bndList.Count > fenceSelected)
                 {
+                    // Clear and remove selected boundary
                     mf.bnd.bndList[fenceSelected].hdLine?.Clear();
                     mf.bnd.bndList.RemoveAt(fenceSelected);
                 }
+
                 fenceSelected = -1;
 
+                // Save updated boundary data and refresh UI
                 mf.FileSaveBoundary();
                 mf.fd.UpdateFieldBoundaryGUIAreas();
                 mf.bnd.BuildTurnLines();
@@ -226,9 +234,11 @@ namespace AgOpenGPS
             }
             else
             {
+                // Show brief message if action was cancelled
                 mf.TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
             }
         }
+
 
         private void ResetAllBoundary()
         {
@@ -260,7 +270,7 @@ namespace AgOpenGPS
             panelChoose.Visible = false;
             panelKML.Visible = false;
 
-            this.Size = new System.Drawing.Size(600,300);
+            this.Size = new System.Drawing.Size(600, 300);
             isClosing = true;
             UpdateChart();
             Close();
@@ -280,7 +290,7 @@ namespace AgOpenGPS
             panelChoose.Visible = true;
             panelChoose.Dock = DockStyle.Fill;
 
-            this.Size = new Size(245,350);
+            this.Size = new Size(245, 350);
         }
 
         private void btnLoadBoundaryFromGE_Click(object sender, EventArgs e)
@@ -401,7 +411,7 @@ namespace AgOpenGPS
             panelChoose.Visible = false;
             panelKML.Visible = false;
 
-            this.Size = new Size(600,300);
+            this.Size = new Size(600, 300);
 
             UpdateChart();
         }
@@ -428,6 +438,23 @@ namespace AgOpenGPS
             panelKML.Visible = false;
             isClosing = true;
         }
+
+        private void btnBuildBoundaryFromTracks_Click(object sender, EventArgs e)
+        {
+            if (mf.bnd.bndList.Count > 0)
+            {
+                var result = FormDialog.Show("Boundary Exists", "A boundary already exists. Do you want to remove it?", MessageBoxButtons.YesNo);
+                if (result != DialogResult.OK) return;
+
+                mf.bnd.bndList.Clear();
+            }
+
+            var form = new FormBuildBoundaryFromTracks(mf, this);
+            form.ShowDialog();
+            isClosing = true;
+            Close();
+        }
+
 
         private void FormBoundary_ResizeEnd(object sender, EventArgs e)
         {

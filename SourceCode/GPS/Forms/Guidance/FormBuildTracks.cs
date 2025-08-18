@@ -44,10 +44,10 @@ namespace AgOpenGPS
             labelABLine.Text = gStr.gsABline;
             labelCurve.Text = gStr.gsCurve;
             labelAPlus.Text = gStr.gsAPlus;
-            labelABLine.Text = gStr.gsABline; 
+            labelABLine.Text = gStr.gsABline;
             labelABLine2.Text = gStr.gsABline;
             labelABCurve.Text = gStr.gsCurve;
-            labelCurve2.Text = gStr.gsCurve;  
+            labelCurve2.Text = gStr.gsCurve;
             labelEditName.Text = gStr.gsEnterName;
             labelEnterName.Text = gStr.gsEnterName;
             labelLatLon.Text = gStr.gsLatLon;
@@ -57,7 +57,7 @@ namespace AgOpenGPS
             labelPivot.Text = gStr.gsPivot;
             labelHeading.Text = gStr.gsHeading;
             labelLatitudeA.Text = gStr.gsLatitude + " A";
-            labelLongtitudeA.Text = gStr.gsLongtitude + " A";  
+            labelLongtitudeA.Text = gStr.gsLongtitude + " A";
             labelLatitudeB.Text = gStr.gsLatitude + " B";
             labelLongtitudeB.Text = gStr.gsLongtitude + "B";
             labelStatus.Text = gStr.gsStatus + ":";
@@ -113,7 +113,7 @@ namespace AgOpenGPS
             nudHeading.Controls[0].Enabled = false;
             nudLatitudePlus.Controls[0].Enabled = false;
             nudLongitudePlus.Controls[0].Enabled = false;
-            nudHeadingLatLonPlus.Controls[0].Enabled = false;   
+            nudHeadingLatLonPlus.Controls[0].Enabled = false;
 
             nudLatitudeA.Value = (decimal)mf.AppModel.CurrentLatLon.Latitude;
             nudLatitudeB.Value = (decimal)mf.AppModel.CurrentLatLon.Latitude + 0.000005m;
@@ -148,7 +148,7 @@ namespace AgOpenGPS
 
             mf.PanelUpdateRightAndBottom();
         }
-        
+
         private void btnCancelMain_Click(object sender, EventArgs e)
         {
             //reload what was
@@ -188,7 +188,7 @@ namespace AgOpenGPS
             mf.curve.desList?.Clear();
 
             if (mf.yt.isYouTurnBtnOn) mf.btnAutoYouTurn.PerformClick();
-            
+
             mf.FileSaveTracks();
 
             if (selectedItem > -1 && mf.trk.gArr.Count > 0 && mf.trk.gArr[selectedItem].isVisible)
@@ -200,7 +200,7 @@ namespace AgOpenGPS
             }
 
             else if (mf.trk.gArr.Count > 0)
-            {               
+            {
                 bool isOneVis = false;
                 int trac = -1;
 
@@ -210,7 +210,7 @@ namespace AgOpenGPS
                     if (item.isVisible)
                     {
                         isOneVis = true;
-                        break;                        
+                        break;
                     }
                 }
 
@@ -279,7 +279,7 @@ namespace AgOpenGPS
                     Name = i.ToString(),
                     TextAlign = ContentAlignment.MiddleCenter,
                     FlatStyle = FlatStyle.Flat,
-            };
+                };
 
                 if (mf.trk.gArr[i].mode == TrackMode.AB)
                     b.Image = Properties.Resources.TrackLine;
@@ -297,7 +297,7 @@ namespace AgOpenGPS
                     Text = mf.trk.gArr[i].name,
                     Name = i.ToString(),
                     Font = backupfont,
-                    ReadOnly = true                    
+                    ReadOnly = true
                 };
                 t.Click += LineSelected_Click;
                 t.Cursor = System.Windows.Forms.Cursors.Default;
@@ -484,14 +484,14 @@ namespace AgOpenGPS
 
         private void btnHideShow_Click(object sender, EventArgs e)
         {
-                for (int i = 0; i < mf.trk.gArr.Count; i++)
-                {
-                    mf.trk.gArr[i].isVisible = isOn;
-                }
+            for (int i = 0; i < mf.trk.gArr.Count; i++)
+            {
+                mf.trk.gArr[i].isVisible = isOn;
+            }
 
-                isOn = !isOn;
+            isOn = !isOn;
 
-                UpdateTable();
+            UpdateTable();
         }
 
         private void btnNewTrack_Click(object sender, EventArgs e)
@@ -532,7 +532,7 @@ namespace AgOpenGPS
                 panelName.Visible = true;
                 this.Size = new System.Drawing.Size(270, 360);
 
-                mf.trk.gArr.Add(new CTrk (mf.trk.gArr[idx]));
+                mf.trk.gArr.Add(new CTrk(mf.trk.gArr[idx]));
 
                 idx = mf.trk.gArr.Count - 1;
 
@@ -626,7 +626,7 @@ namespace AgOpenGPS
 
             panelChoose.Visible = false;
             panelPivot.Visible = true;
-            this.Size = new System.Drawing.Size(370,360);
+            this.Size = new System.Drawing.Size(370, 360);
 
             nudLatitudePivot.Value = (decimal)mf.AppModel.CurrentLatLon.Latitude;
             nudLongitudePivot.Value = (decimal)mf.AppModel.CurrentLatLon.Longitude;
@@ -896,7 +896,7 @@ namespace AgOpenGPS
             mf.trk.gArr[idx].heading = mf.ABLine.desHeading;
 
             mf.ABLine.desName = "AB " +
-                (Math.Round(glm.toDegrees(mf.ABLine.desHeading), 5)).ToString(CultureInfo.InvariantCulture) + "\u00B0 " ;
+                (Math.Round(glm.toDegrees(mf.ABLine.desHeading), 5)).ToString(CultureInfo.InvariantCulture) + "\u00B0 ";
             textBox1.Text = mf.ABLine.desName;
 
             double dist;
@@ -952,7 +952,7 @@ namespace AgOpenGPS
 
             btnEnter_AB.Enabled = true;
             nudHeading.Enabled = true;
-           
+
             nudHeading.Value = (decimal)(glm.toDegrees(mf.ABLine.desHeading));
 
             timer1.Enabled = true;
@@ -998,7 +998,7 @@ namespace AgOpenGPS
             mf.trk.gArr[idx].heading = mf.ABLine.desHeading;
 
             mf.ABLine.desName = "A+" +
-                (Math.Round(glm.toDegrees(mf.ABLine.desHeading), 5)).ToString(CultureInfo.InvariantCulture) + "\u00B0 " ;
+                (Math.Round(glm.toDegrees(mf.ABLine.desHeading), 5)).ToString(CultureInfo.InvariantCulture) + "\u00B0 ";
             textBox1.Text = mf.ABLine.desName;
 
             double dist;

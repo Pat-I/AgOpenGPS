@@ -333,16 +333,16 @@ namespace AgOpenGPS
         public void DrawABLineNew()
         {
             //ABLine currently being designed
-                GL.LineWidth(lineWidth);
-                GL.Begin(PrimitiveType.Lines);
-                GL.Color3(0.95f, 0.70f, 0.50f);
-                GL.Vertex3(desLineEndA.easting, desLineEndA.northing, 0.0);
-                GL.Vertex3(desLineEndB.easting, desLineEndB.northing, 0.0);
-                GL.End();
+            GL.LineWidth(lineWidth);
+            GL.Begin(PrimitiveType.Lines);
+            GL.Color3(0.95f, 0.70f, 0.50f);
+            GL.Vertex3(desLineEndA.easting, desLineEndA.northing, 0.0);
+            GL.Vertex3(desLineEndB.easting, desLineEndB.northing, 0.0);
+            GL.End();
 
-                GL.Color3(0.2f, 0.950f, 0.20f);
-                mf.font.DrawText3D(desPtA.easting, desPtA.northing, "&A", mf.camHeading);
-                mf.font.DrawText3D(desPtB.easting, desPtB.northing, "&B", mf.camHeading);
+            GL.Color3(0.2f, 0.950f, 0.20f);
+            mf.font.DrawText3D(desPtA.easting, desPtA.northing, "&A", mf.camHeading);
+            mf.font.DrawText3D(desPtB.easting, desPtB.northing, "&B", mf.camHeading);
         }
 
         public void DrawABLines()
@@ -409,9 +409,9 @@ namespace AgOpenGPS
             GL.End();
 
             //draw current AB Line
-            GL.LineWidth(lineWidth*3);
+            GL.LineWidth(lineWidth * 3);
             GL.Begin(PrimitiveType.Lines);
-            GL.Color3(0,0,0);
+            GL.Color3(0, 0, 0);
             GL.Vertex3(currentLinePtA.easting, currentLinePtA.northing, 0.0);
             GL.Vertex3(currentLinePtB.easting, currentLinePtB.northing, 0.0);
             GL.End();
@@ -432,7 +432,7 @@ namespace AgOpenGPS
                 double cosHeading = Math.Cos(-abHeading);
                 double sinHeading = Math.Sin(-abHeading);
 
-                GL.Color4(0,0,0, 0.5);
+                GL.Color4(0, 0, 0, 0.5);
 
                 GL.LineWidth(lineWidth * 3);
 
@@ -444,7 +444,7 @@ namespace AgOpenGPS
                     {
                         GL.Vertex3((cosHeading * (toolWidth * i)) + currentLinePtA.easting, (sinHeading * (toolWidth * i)) + currentLinePtA.northing, 0);
                         GL.Vertex3((cosHeading * (toolWidth * i)) + currentLinePtB.easting, (sinHeading * (toolWidth * i)) + currentLinePtB.northing, 0);
-                        
+
                         GL.Vertex3((cosHeading * (-toolWidth * i)) + currentLinePtA.easting, (sinHeading * (-toolWidth * i)) + currentLinePtA.northing, 0);
                         GL.Vertex3((cosHeading * (-toolWidth * i)) + currentLinePtB.easting, (sinHeading * (-toolWidth * i)) + currentLinePtB.northing, 0);
                     }

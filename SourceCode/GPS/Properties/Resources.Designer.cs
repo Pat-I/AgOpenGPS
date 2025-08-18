@@ -562,6 +562,16 @@ namespace AgOpenGPS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap BoundaryFromTracks {
+            get {
+                object obj = ResourceManager.GetObject("BoundaryFromTracks", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BoundaryLeft {
             get {
                 object obj = ResourceManager.GetObject("BoundaryLeft", resourceCulture);
@@ -1930,6 +1940,15 @@ namespace AgOpenGPS.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream Headland {
+            get {
+                return ResourceManager.GetStream("Headland", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap HeadlandBuild {
@@ -1945,6 +1964,16 @@ namespace AgOpenGPS.Properties {
         internal static System.Drawing.Bitmap HeadlandDeletePoints {
             get {
                 object obj = ResourceManager.GetObject("HeadlandDeletePoints", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap HeadlandDistance {
+            get {
+                object obj = ResourceManager.GetObject("HeadlandDistance", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -2444,6 +2473,15 @@ namespace AgOpenGPS.Properties {
             get {
                 object obj = ResourceManager.GetObject("ResetTool", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream rtk_back {
+            get {
+                return ResourceManager.GetStream("rtk_back", resourceCulture);
             }
         }
         
@@ -3447,6 +3485,26 @@ namespace AgOpenGPS.Properties {
         internal static System.Drawing.Bitmap z_FrontWheels {
             get {
                 object obj = ResourceManager.GetObject("z_FrontWheels", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap z_HeadlandDark {
+            get {
+                object obj = ResourceManager.GetObject("z_HeadlandDark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap z_HeadlandLight {
+            get {
+                object obj = ResourceManager.GetObject("z_HeadlandLight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

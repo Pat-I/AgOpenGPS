@@ -1,4 +1,4 @@
-﻿﻿using AgLibrary.ViewModels;
+﻿using AgLibrary.ViewModels;
 
 namespace AgOpenGPS.Core.ViewModels
 {

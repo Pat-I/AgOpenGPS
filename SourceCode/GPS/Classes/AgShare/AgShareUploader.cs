@@ -11,12 +11,12 @@ using System.Linq;
 using System.Diagnostics;
 using AgLibrary.Logging;
 using AgOpenGPS.Core.Models;
+using AgOpenGPS.Forms;
 
 namespace AgOpenGPS
 {
     public class CAgShareUploader
     {
-        private readonly FormGPS gps;
 
         // Create a snapshot from the current GPS session to upload
         public static FieldSnapshot CreateSnapshot(FormGPS gps)
@@ -118,7 +118,6 @@ namespace AgOpenGPS
                 {
                     string txtPath = Path.Combine(snapshot.FieldDirectory, "agshare.txt");
                     File.WriteAllText(txtPath, snapshot.FieldId.ToString());
-                    gps.TimedMessageBox(1000, "AgShare", "Upload Succesfully");
                     Log.EventWriter("Field uploaded to AgShare: " + snapshot.FieldName + " (" + snapshot.FieldId + ")");
                 }
             }

@@ -161,13 +161,13 @@
             this.label55 = new System.Windows.Forms.Label();
             this.labelInvertWas = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.btnExpand = new ProXoft.WinForms.RepeatButton();
+            this.btnExpand = new AgLibrary.Controls.RepeatButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnStartSA = new System.Windows.Forms.Button();
             this.btnFreeDriveZero = new System.Windows.Forms.Button();
-            this.btnSteerAngleUp = new ProXoft.WinForms.RepeatButton();
+            this.btnSteerAngleUp = new AgLibrary.Controls.RepeatButton();
             this.btnFreeDrive = new System.Windows.Forms.Button();
-            this.btnSteerAngleDown = new ProXoft.WinForms.RepeatButton();
+            this.btnSteerAngleDown = new AgLibrary.Controls.RepeatButton();
             this.hsbarSensor = new System.Windows.Forms.HScrollBar();
             this.lblhsbarSensor = new System.Windows.Forms.Label();
             this.labelReset = new System.Windows.Forms.Label();
@@ -237,6 +237,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.pboxSendSteer = new System.Windows.Forms.PictureBox();
             this.btnSendSteerConfigPGN = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPP.SuspendLayout();
             this.tabStan.SuspendLayout();
@@ -1845,7 +1846,7 @@
             this.labelSendAndSave.Font = new System.Drawing.Font("Tahoma", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelSendAndSave.ForeColor = System.Drawing.Color.Black;
             this.labelSendAndSave.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.labelSendAndSave.Location = new System.Drawing.Point(717, 530);
+            this.labelSendAndSave.Location = new System.Drawing.Point(641, 530);
             this.labelSendAndSave.Name = "labelSendAndSave";
             this.labelSendAndSave.Size = new System.Drawing.Size(175, 21);
             this.labelSendAndSave.TabIndex = 502;
@@ -2142,7 +2143,7 @@
             this.labelReset.BackColor = System.Drawing.Color.Transparent;
             this.labelReset.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelReset.ForeColor = System.Drawing.Color.Black;
-            this.labelReset.Location = new System.Drawing.Point(515, 530);
+            this.labelReset.Location = new System.Drawing.Point(485, 530);
             this.labelReset.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelReset.Name = "labelReset";
             this.labelReset.Size = new System.Drawing.Size(150, 23);
@@ -2192,7 +2193,6 @@
             this.label34.TabIndex = 527;
             this.label34.Text = "Stanley/ Pure";
             this.label34.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.label34.Click += new System.EventHandler(this.label34_Click);
             // 
             // tabSteerSettings
             // 
@@ -3194,7 +3194,7 @@
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.button2.Image = global::AgOpenGPS.Properties.Resources.Reset_Default;
-            this.button2.Location = new System.Drawing.Point(553, 554);
+            this.button2.Location = new System.Drawing.Point(523, 554);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 69);
             this.button2.TabIndex = 522;
@@ -3205,7 +3205,7 @@
             // 
             this.pboxSendSteer.BackgroundImage = global::AgOpenGPS.Properties.Resources.ConSt_Mandatory1;
             this.pboxSendSteer.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pboxSendSteer.Location = new System.Drawing.Point(831, 560);
+            this.pboxSendSteer.Location = new System.Drawing.Point(753, 560);
             this.pboxSendSteer.Name = "pboxSendSteer";
             this.pboxSendSteer.Size = new System.Drawing.Size(61, 62);
             this.pboxSendSteer.TabIndex = 509;
@@ -3219,12 +3219,28 @@
             this.btnSendSteerConfigPGN.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSendSteerConfigPGN.Image = global::AgOpenGPS.Properties.Resources.ToolAcceptChange;
             this.btnSendSteerConfigPGN.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSendSteerConfigPGN.Location = new System.Drawing.Point(721, 560);
+            this.btnSendSteerConfigPGN.Location = new System.Drawing.Point(643, 560);
             this.btnSendSteerConfigPGN.Name = "btnSendSteerConfigPGN";
             this.btnSendSteerConfigPGN.Size = new System.Drawing.Size(103, 62);
             this.btnSendSteerConfigPGN.TabIndex = 501;
             this.btnSendSteerConfigPGN.UseVisualStyleBackColor = false;
             this.btnSendSteerConfigPGN.Click += new System.EventHandler(this.btnSendSteerConfigPGN_Click);
+            // 
+            // btnClose
+            // 
+            this.btnClose.BackColor = System.Drawing.Color.Transparent;
+            this.btnClose.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.btnClose.FlatAppearance.BorderSize = 0;
+            this.btnClose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClose.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.btnClose.Image = global::AgOpenGPS.Properties.Resources.OK64;
+            this.btnClose.Location = new System.Drawing.Point(824, 558);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(64, 64);
+            this.btnClose.TabIndex = 531;
+            this.btnClose.UseVisualStyleBackColor = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // FormSteer
             // 
@@ -3232,6 +3248,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(898, 628);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.labelWizard);
             this.Controls.Add(this.btnSteerWizard);
             this.Controls.Add(this.tabSteerSettings);
@@ -3326,8 +3343,8 @@
         private System.Windows.Forms.Label lblSteerAngleActual;
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Button btnFreeDriveZero;
-        private ProXoft.WinForms.RepeatButton btnSteerAngleDown;
-        private ProXoft.WinForms.RepeatButton btnSteerAngleUp;
+        private AgLibrary.Controls.RepeatButton btnSteerAngleDown;
+        private AgLibrary.Controls.RepeatButton btnSteerAngleUp;
         private System.Windows.Forms.Label lblPWMDisplay;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label11;
@@ -3418,7 +3435,7 @@
         private System.Windows.Forms.Label lblAV_Act;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.Label label38;
-        private ProXoft.WinForms.RepeatButton btnExpand;
+        private AgLibrary.Controls.RepeatButton btnExpand;
         private System.Windows.Forms.TabControl tabSteerSettings;
         private System.Windows.Forms.TabPage tabSensors;
         private System.Windows.Forms.TabPage tabConfig;
@@ -3511,5 +3528,6 @@
         private System.Windows.Forms.Label labelAquire;
         private System.Windows.Forms.Label lblAcquirePP;
         private System.Windows.Forms.Label labelWasZero;
+        private System.Windows.Forms.Button btnClose;
     }
 }

@@ -255,7 +255,7 @@ namespace AgIO
 
             //run gps_out or not
             cboxAutoRunGPS_Out.Checked = Properties.Settings.Default.setDisplay_isAutoRunGPS_Out;
-            
+
             this.Text =
             "AgIO  v" + Program.Version + " Profile: " + RegistrySettings.profileName;
 

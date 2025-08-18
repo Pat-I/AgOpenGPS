@@ -45,8 +45,9 @@ namespace AgOpenGPS.Core.ViewModels
         public string NewFieldName
         {
             get { return _newFieldName; }
-            set {
-                if (value != _newFieldName )
+            set
+            {
+                if (value != _newFieldName)
                 {
                     _newFieldName = value;
                     NotifyPropertyChanged();

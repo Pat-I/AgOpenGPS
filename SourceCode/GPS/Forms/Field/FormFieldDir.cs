@@ -1,6 +1,7 @@
 ﻿using AgLibrary.Logging;
 using AgOpenGPS.Controls;
 using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Forms;
 using AgOpenGPS.Helpers;
 using System;
 using System.Globalization;
@@ -77,8 +78,6 @@ namespace AgOpenGPS
                 return;
             }
 
-            if (mf.isJobStarted) mf.FileSaveEverythingBeforeClosingField();
-
             //append date time to name
 
             mf.currentFieldDirectory = tboxFieldName.Text.Trim();
@@ -96,7 +95,7 @@ namespace AgOpenGPS
                 //create it for first save
                 if (dirNewField.Exists)
                 {
-                    MessageBox.Show(gStr.gsChooseADifferentName, gStr.gsDirectoryExists, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    FormDialog.Show(gStr.gsDirectoryExists, gStr.gsChooseADifferentName, MessageBoxButtons.OK);
                     return;
                 }
                 else
@@ -122,7 +121,7 @@ namespace AgOpenGPS
             {
                 Log.EventWriter("Creating new field " + ex);
 
-                MessageBox.Show(gStr.gsError, ex.ToString());
+                FormDialog.Show(gStr.gsError, ex.ToString(), MessageBoxButtons.OK);
                 mf.currentFieldDirectory = "";
             }
 

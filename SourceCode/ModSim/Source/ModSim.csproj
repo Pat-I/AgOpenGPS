@@ -18,10 +18,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.6.0" />
     <PackageReference Include="System.Resources.Extensions" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\Controls.Designer.cs">
+      <DependentUpon>FormSim.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\UDP.Designer.cs">
+      <DependentUpon>FormSim.cs</DependentUpon>
+    </Compile>
     <Compile Update="gStr.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
