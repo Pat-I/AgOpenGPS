@@ -154,15 +154,15 @@ namespace AgIO
                                 {
                                     var properties = nic.GetIPStatistics();
                                     tboxNets.Text +=
-                                            info.Address + "  - " + nic.OperationalStatus + "\r\n";                                            
+                                            info.Address + "  - " + nic.OperationalStatus + "\r\n";
 
                                     tboxNets.Text += info.IPv4Mask.ToString() + "  " + nic.Name.ToString() + "\r\n";
-                                    tboxNets.Text += 
-                                        "->" + (properties.NonUnicastPacketsSent 
+                                    tboxNets.Text +=
+                                        "->" + (properties.NonUnicastPacketsSent
                                         + properties.UnicastPacketsSent).ToString()
 
                                         + "  <-" + (properties.NonUnicastPacketsReceived
-                                        + properties.UnicastPacketsReceived).ToString() + "\r\n"                                 
+                                        + properties.UnicastPacketsReceived).ToString() + "\r\n"
                                         + "\r\n";
                                 }
 

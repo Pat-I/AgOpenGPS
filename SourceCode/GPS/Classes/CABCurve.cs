@@ -215,7 +215,7 @@ namespace AgOpenGPS
             }
         }
 
-        
+
         public List<vec3> BuildNewOffsetList(double distAway, CTrk track, CancellationToken ct = default)
         {
             //the list of points of curve new list from async
@@ -509,7 +509,7 @@ namespace AgOpenGPS
             {
                 Log.EventWriter("Exception Build new offset curve" + e.ToString());
             }
-            
+
             return newCurList;
         }
 
@@ -634,7 +634,7 @@ namespace AgOpenGPS
                 // Update based on autosteer settings and distance from line
                 double goalPointDistance = mf.vehicle.UpdateGoalPointDistance();
                 bool ReverseHeading = mf.isReverse ? !isHeadingSameWay : isHeadingSameWay;
-                
+
                 if (mf.yt.isYouTurnTriggered && mf.yt.DistanceFromYouTurnLine())//do the pure pursuit from youTurn
                 {
                     //now substitute what it thinks are AB line values with auto turn values
@@ -751,7 +751,7 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            A --;
+                            A--;
                             B = A + 1;
                         }
 
@@ -997,8 +997,8 @@ namespace AgOpenGPS
             {
                 if (curList.Count > 0)
                 {
-                    GL.LineWidth(mf.ABLine.lineWidth*3);
-                    GL.Color3(0,0,0);
+                    GL.LineWidth(mf.ABLine.lineWidth * 3);
+                    GL.Color3(0, 0, 0);
 
                     //GL.Enable(EnableCap.LineSmooth);
 

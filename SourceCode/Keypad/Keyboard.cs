@@ -149,12 +149,12 @@ namespace Keypad
                         d12.Text = "-";
 
                         e1.Text = ">";
-                        e2.Text ="W";
-                        e3.Text ="X" ;
-                        e4.Text ="C" ;
-                        e5.Text ="V" ;
-                        e6.Text ="B" ;
-                        e7.Text ="N" ;
+                        e2.Text = "W";
+                        e3.Text = "X";
+                        e4.Text = "C";
+                        e5.Text = "V";
+                        e6.Text = "B";
+                        e7.Text = "N";
                         e8.Text = "?";
                         e9.Text = ".";
                         e10.Text = "/";
@@ -261,11 +261,10 @@ namespace Keypad
                         c7.Text = "Z";
                         c8.Text = "U";
                         c9.Text = "I";
-                        c10.Text ="O";
+                        c10.Text = "O";
                         c11.Text = "P";
                         c12.Text = "\u00DC";
 
-                       
                         d1.Text = "-";
                         d2.Text = "A";
                         d3.Text = "S";
@@ -275,9 +274,9 @@ namespace Keypad
                         d7.Text = "H";
                         d8.Text = "J";
                         d9.Text = "K";
-                        d10.Text ="L";
+                        d10.Text = "L";
                         d11.Text = "\u00D6";
-                        d12.Text = "\u00C4"; 
+                        d12.Text = "\u00C4";
 
                         e1.Text = "~";
                         e2.Text = "+";
@@ -305,7 +304,7 @@ namespace Keypad
                         c7.Text = "z";
                         c8.Text = "u";
                         c9.Text = "i";
-                        c10.Text ="o";
+                        c10.Text = "o";
                         c11.Text = "p";
                         c12.Text = "\u00FC";
 
@@ -319,9 +318,9 @@ namespace Keypad
                         d7.Text = "h";
                         d8.Text = "j";
                         d9.Text = "k";
-                        d10.Text ="l";
+                        d10.Text = "l";
                         d11.Text = "\u00F6";
-                        d12.Text = "\u00E4"; 
+                        d12.Text = "\u00E4";
 
                         e1.Text = "|";
                         e2.Text = "=";
@@ -352,7 +351,6 @@ namespace Keypad
                     }
 
                     break;
-                   
 
                 default:
 
@@ -379,11 +377,10 @@ namespace Keypad
                         c7.Text = "Y";
                         c8.Text = "U";
                         c9.Text = "I";
-                        c10.Text ="O";
-                        c11.Text = "P"; 
+                        c10.Text = "O";
+                        c11.Text = "P";
                         c12.Text = ".";
 
-                        
                         d1.Text = "|";
                         d2.Text = "A";
                         d3.Text = "S";
@@ -393,7 +390,7 @@ namespace Keypad
                         d7.Text = "H";
                         d8.Text = "J";
                         d9.Text = "K";
-                        d10.Text ="L"; 
+                        d10.Text = "L";
                         d11.Text = "-";
 
                         e1.Text = "{";
@@ -434,10 +431,9 @@ namespace Keypad
                         c7.Text = "y";
                         c8.Text = "u";
                         c9.Text = "i";
-                        c10.Text ="o";
+                        c10.Text = "o";
                         c11.Text = "p";
 
-                        
                         d1.Text = "~";
                         d2.Text = "a";
                         d3.Text = "s";
@@ -447,7 +443,7 @@ namespace Keypad
                         d7.Text = "h";
                         d8.Text = "j";
                         d9.Text = "k";
-                        d10.Text ="l"; 
+                        d10.Text = "l";
                         d11.Text = "_";
 
                         e1.Text = "[";
@@ -459,7 +455,7 @@ namespace Keypad
                         e7.Text = "b";
                         e8.Text = "n";
                         e9.Text = "m";
-                        e10.Text =",";
+                        e10.Text = ",";
                         e11.Text = ".";
                         e12.Text = ";";
 
@@ -470,7 +466,6 @@ namespace Keypad
             }
         }
 
-                      
         private void Btn_space_Click(object sender, EventArgs e)
         {
             RaiseButtonPressed(' ');

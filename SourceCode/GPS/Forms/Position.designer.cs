@@ -99,6 +99,8 @@ namespace AgOpenGPS
         private double nowHz = 0, filteredDelta = 0, delta = 0;
 
         public bool isRTK_AlarmOn, isRTK_KillAutosteer;
+        private DateTime RTKBackSinceUtc = DateTime.MinValue;
+        private const int RTK_RECOVER_DEBOUNCE_MS = 1000;
 
         public double headlandDistanceDelta = 0, boundaryDistanceDelta = 0;
 

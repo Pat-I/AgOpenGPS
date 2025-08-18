@@ -9,36 +9,6 @@ namespace AgOpenGPS
 
     public static class glm
     {
-        //public static void GetClosestSegmentLooping(this vec2 Point, List<vec3> curList, out int AA, out int BB, out double minDistA, int Start = 0, int End = int.MaxValue)
-        //{
-        //    bool isLoop = true;
-        //    AA = -1; BB = -1;
-        //    minDistA = double.MaxValue;
-        //    int A = Start > 0 ? Start - 1 : curList.Count - 1;
-        //    bool looping = isLoop & Start > End;
-        //    for (int B = (Start > 0 ? Start : 0); B < End || looping; A = B++)
-        //    {
-        //        if (B == curList.Count)
-        //        {
-        //            if (looping)
-        //            {
-        //                B = -1; looping = false;
-        //                continue;
-        //            }
-        //            else break;
-        //        }
-        //        if (B == 0 && !isLoop) continue;
-        //        else if (B == 0) A = curList.Count - 1;
-
-        //        double dist2 = DistanceSquared(curList[A], curList[B]);
-        //        if (dist2 < minDistA)
-        //        {
-        //            minDistA = dist2; AA = A;
-        //            BB = B;
-        //        }
-        //    }
-        //}
-
         public static bool InRangeBetweenAB(double start_x, double start_y, double end_x, double end_y,
           double point_x, double point_y)
         {
@@ -386,6 +356,66 @@ namespace AgOpenGPS
             //dispose the Graphics object
             g.Dispose();
             return newBitmap;
+        }
+        // Optional: absolute angle difference (range 0–π)
+        public static double AngleDiff(double angle1, double angle2)
+        {
+            double diff = Math.Abs(angle1 - angle2);
+            if (diff > Math.PI) diff = twoPI - diff;
+            return diff;
+        }
+
+        /// <summary>
+        /// This method performs a raycast from the origin point in the direction of the heading
+        /// This is used for HeadlandProximity and the distance to the headland
+        /// </summary>
+
+        public static vec2? RaycastToPolygon(vec3 origin, List<vec3> polygon)
+        {
+            vec2 from = origin.ToVec2();
+            vec2 dir = new vec2(Math.Sin(origin.heading), Math.Cos(origin.heading));
+
+            double minDist = double.MaxValue;
+            vec2? closest = null;
+
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                vec2 p1 = polygon[i].ToVec2();
+                vec2 p2 = polygon[(i + 1) % polygon.Count].ToVec2();
+
+                if (TryRaySegmentIntersection(from, dir, p1, p2, out vec2 intersection))
+                {
+                    double dist = Distance(from, intersection);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        closest = intersection;
+                    }
+                }
+            }
+
+            return closest;
+        }
+        public static bool TryRaySegmentIntersection(vec2 rayOrigin, vec2 rayDir, vec2 segA, vec2 segB, out vec2 intersection)
+        {
+            intersection = new vec2();
+
+            double dx = segB.easting - segA.easting;
+            double dy = segB.northing - segA.northing;
+
+            double det = (-rayDir.easting * dy + dx * rayDir.northing);
+            if (Math.Abs(det) < 1e-8) return false; // parallel
+
+            double s = (-dy * (segA.easting - rayOrigin.easting) + dx * (segA.northing - rayOrigin.northing)) / det;
+            double t = (rayDir.easting * (segA.northing - rayOrigin.northing) - rayDir.northing * (segA.easting - rayOrigin.easting)) / det;
+
+            if (s >= 0 && t >= 0 && t <= 1)
+            {
+                intersection = new vec2(rayOrigin.easting + s * rayDir.easting, rayOrigin.northing + s * rayDir.northing);
+                return true;
+            }
+
+            return false;
         }
     }
 }

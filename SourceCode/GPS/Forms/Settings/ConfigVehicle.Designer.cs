@@ -36,6 +36,7 @@ namespace AgOpenGPS
             mf.isDirectionMarkers = chkDirectionMarkers.Checked;
             mf.isSectionlinesOn = chkSectionLines.Checked;
             mf.isLineSmooth = chkLineSmooth.Checked;
+            mf.isHeadlandDistanceOn = chkboxHeadlandDist.Checked;
 
             //mf.timeToShowMenus = (int)nudMenusOnTime.Value;
 
@@ -51,6 +52,7 @@ namespace AgOpenGPS
             Properties.Settings.Default.setMenu_isPureOn = mf.isPureDisplayOn;
             Properties.Settings.Default.setMenu_isLightbarOn = mf.isLightbarOn;
             Properties.Settings.Default.setDisplay_isKeyboardOn = mf.isKeyboardOn;
+            Properties.Settings.Default.isHeadlandDistanceOn = mf.isHeadlandDistanceOn;
             Properties.Settings.Default.setDisplay_isLogElevation = mf.isLogElevation;
 
             Properties.Settings.Default.setMenu_isMetric = rbtnDisplayMetric.Checked;
@@ -61,6 +63,7 @@ namespace AgOpenGPS
             Properties.Settings.Default.setAS_numGuideLines = mf.ABLine.numGuideLines;
             Properties.Settings.Default.setDisplay_isSectionLinesOn = mf.isSectionlinesOn;
             Properties.Settings.Default.setDisplay_isLineSmooth = mf.isLineSmooth;
+            Properties.Settings.Default.isHeadlandDistanceOn = mf.isHeadlandDistanceOn;
 
             Properties.Settings.Default.Save();
         }
@@ -195,7 +198,7 @@ namespace AgOpenGPS
             nudTractorHitchLength.Visible = rbtnTBT.Checked || rbtnTrailing.Checked;
             label94.Visible = rbtnTBT.Checked || rbtnTrailing.Checked;
             labelHitchLength.Visible = rbtnTBT.Checked || rbtnTrailing.Checked;
-            HitchLengthBlindBox.Visible = rbtnFixedRear.Checked || rbtnFront.Checked; 
+            HitchLengthBlindBox.Visible = rbtnFixedRear.Checked || rbtnFront.Checked;
 
             label94.Text = mf.unitsInCm;
             label95.Text = mf.unitsInCm;
@@ -273,7 +276,7 @@ namespace AgOpenGPS
                 mf.vehicle.VehicleConfig.Type = VehicleType.Harvester;
                 Properties.Settings.Default.setVehicle_vehicleType = 1;
 
-                if ( mf.tool.hitchLength < 0) mf.tool.hitchLength *= -1;
+                if (mf.tool.hitchLength < 0) mf.tool.hitchLength *= -1;
 
                 Properties.Settings.Default.setTool_isToolFront = true;
                 Properties.Settings.Default.setTool_isToolTBT = false;

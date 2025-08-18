@@ -54,7 +54,8 @@ namespace AgOpenGPS.Core
 
         public double GridStep { private get; set; }
 
-        public Bitmap BingBitmap {
+        public Bitmap BingBitmap
+        {
             set
             {
                 _bingBitmap = value;

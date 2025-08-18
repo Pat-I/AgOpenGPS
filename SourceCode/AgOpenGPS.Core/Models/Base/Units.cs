@@ -1,5 +1,4 @@
-﻿﻿using AgOpenGPS.Core.Models;
-using System;
+﻿using System;
 
 namespace AgOpenGPS.Core.Models
 {

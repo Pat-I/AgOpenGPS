@@ -1,34 +1,26 @@
 ﻿//Please, if you use this, share the improvements
 
-using AgLibrary.Logging;
-using AgOpenGPS;
-using AgOpenGPS.Classes;
-using AgOpenGPS.Core;
-using AgOpenGPS.Core.Models;
-using AgOpenGPS.Core.ViewModels;
-using AgOpenGPS.Core.Translations;
-using AgOpenGPS.Forms.Profiles;
-using AgOpenGPS.Properties;
-using AgOpenGPS.Classes.AgShare.Helpers;
-using Microsoft.Win32;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Net.Sockets;
-using System.Reflection;
-using System.Resources;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using AgLibrary.Logging;
+using AgOpenGPS.Classes;
+using AgOpenGPS.Controls;
+using AgOpenGPS.Core;
+using AgOpenGPS.Core.Models;
+using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Core.ViewModels;
+using AgOpenGPS.Forms.Profiles;
+using AgOpenGPS.Properties;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace AgOpenGPS
 {
@@ -42,9 +34,11 @@ namespace AgOpenGPS
 
         // Deprecated. Only here to avoid numerous changes to existing code that not has been refactored.
         // Please use AppViewModel.IsMetric directly
-        public bool isMetric {
+        public bool isMetric
+        {
             get { return AppViewModel.IsMetric; }
-            set {
+            set
+            {
                 AppViewModel.IsMetric = value;
             }
         }
@@ -524,7 +518,7 @@ namespace AgOpenGPS
             //nmea limiter
             udpWatch.Start();
 
-            ControlExtension.Draggable(panelDrag, true);
+            panelDrag.Draggable(true);
 
             hotkeys = new char[19];
 
@@ -550,16 +544,15 @@ namespace AgOpenGPS
         // Centralized shutdown coordinator
         private bool isShuttingDown = false;
 
-        private async void FormGPS_FormClosing(object sender, FormClosingEventArgs e)
+        private void FormGPS_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (isShuttingDown)
-            {
-                return;
-            }
+            if (isShuttingDown) return;
             //set the shutdown flag to true to prevent re-entrance
             isShuttingDown = true;
 
-            // Attempt to close subforms cleanly
+            e.Cancel = true; // Prevent immediate close
+
+            // Close subforms
             string[] formNames = { "FormGPSData", "FormFieldData", "FormPan", "FormTimedMessage" };
             foreach (string name in formNames)
             {
@@ -592,39 +585,93 @@ namespace AgOpenGPS
             {
                 if (autoBtnState == btnStates.Auto)
                     btnSectionMasterAuto.PerformClick();
-
-                if (manualBtnState == btnStates.On)
-                    btnSectionMasterManual.PerformClick();
-
-                if (Settings.Default.AgShareEnabled)
-                {
-                    TimedMessageBox(5000, "AgShare", "Uploading field to AgShare...\nPlease wait and get a beer.");
-                    isAgShareUploadStarted = true;
-                    agShareUploadTask = CAgShareUploader.UploadAsync(snapshot, agShareClient, this);
-
-                    e.Cancel = true;
-                    await DelayedShutdownAfterUpload(choice);
-                    return;
-                }
-                FileSaveEverythingBeforeClosingField();
             }
-            // No upload required, skip DelayedShutDown and finalize shutdown
+
+            BeginInvoke(new Func<Task>(async () => await ShowSavingFormAndShutdown(choice)));
+        }
+
+
+        private async Task ShowSavingFormAndShutdown(int choice)
+        {
+            using (FormSaving savingForm = new FormSaving())
+            {
+                if (isJobStarted)
+                {
+                    bool isAgShareStepEnabled = Settings.Default.AgShareEnabled && Settings.Default.AgShareUploadActive && !isAgShareUploadStarted;
+
+                    savingForm.AddStep("Params", gStr.gsSaveFieldParam);
+                    if (isAgShareStepEnabled) savingForm.AddStep("AgShare", gStr.gsSaveUploadToAgshare);
+                    savingForm.AddStep("Field", gStr.gsSaveField);
+                    savingForm.AddStep("Settings", gStr.gsSaveSettings);
+                    savingForm.AddStep("Finalize", gStr.gsSaveFinalizeShutdown);
+
+                    savingForm.Show();
+
+                    await Task.Delay(300); // Let UI settle
+
+                    // STEP 0: Parameters
+                    await Task.Delay(300);
+                    savingForm.UpdateStep("Params", gStr.gsSaveFieldParamSaved, SavingStepState.Done);
+
+                    // STEP 1: AgShare Upload
+                    if (isAgShareStepEnabled)
+                    {
+                        isAgShareUploadStarted = true;
+
+                        try
+                        {
+                            agShareUploadTask = CAgShareUploader.UploadAsync(snapshot, agShareClient, this);
+                            await agShareUploadTask;
+                            savingForm.UpdateStep("AgShare", gStr.gsSaveUploadCompleted, SavingStepState.Done);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.EventWriter("AgShare upload error during shutdown: " + ex.Message);
+                            savingForm.UpdateStep("AgShare", gStr.gsSaveUploadFailed, SavingStepState.Failed);
+                        }
+                    }
+
+                    // STEP 2: Save Field
+                    await FileSaveEverythingBeforeClosingField();
+                    savingForm.UpdateStep("Field", gStr.gsSaveFieldSavedLocal, SavingStepState.Done);
+
+                    // STEP 3: Settings
+                    Settings.Default.Save();
+                    await Task.Delay(300);
+                    savingForm.UpdateStep("Settings", gStr.gsSaveSettingsSaved, SavingStepState.Done);
+
+                    // STEP 4: Finalizing
+                    await Task.Delay(500);
+                    savingForm.UpdateStep("Finalize", gStr.gsSaveAllDone, SavingStepState.Done);
+                    await Task.Delay(750);
+                    savingForm.Finish();
+                }
+                else
+                {
+                    savingForm.AddStep("Settings", gStr.gsSaveSettings);
+                    savingForm.AddStep("Finalize", gStr.gsSaveFinalizeShutdown);
+
+                    savingForm.Show();
+
+                    await Task.Delay(300); // Let UI settle
+
+                    // Only saving settings and finalizing
+                    Settings.Default.Save();
+                    await Task.Delay(300);
+                    savingForm.UpdateStep("Settings", gStr.gsSaveSettingsSaved, SavingStepState.Done);
+                    await Task.Delay(300);
+                    savingForm.UpdateStep("Finalize", gStr.gsSaveAllDone, SavingStepState.Done);
+                    await Task.Delay(750);
+                    savingForm.Finish();
+                }
+
+                await Task.Delay(2000);
+                savingForm.Close();
+            }
+
             FinishShutdown(choice);
         }
 
-        private async Task DelayedShutdownAfterUpload(int choice)
-        {
-            try
-            {
-                await agShareUploadTask;
-                agShareUploadTask = null;
-            }
-            catch (Exception) { }
-            if (!this.IsDisposed && !this.Disposing)
-            {
-                FinishShutdown(choice);
-            }
-        }
 
         private void FinishShutdown(int choice)
         {
@@ -637,10 +684,6 @@ namespace AgOpenGPS
                 + "   Missed Per Minute: " + ((double)missedSentenceCount / minutesSinceStart).ToString("N4"));
 
             Log.EventWriter("Program Exit: " + DateTime.Now.ToString("f", CultureInfo.CreateSpecificCulture(RegistrySettings.culture)) + "\r");
-
-            // Save settings
-            Settings.Default.Save();
-
 
             // Restore display brightness
             if (displayBrightness.isWmiMonitor)
@@ -766,7 +809,7 @@ namespace AgOpenGPS
             }
         }
 
-         //request a new job
+        //request a new job
         public void JobNew()
         {
             //SendSteerSettingsOutAutoSteerPort();
@@ -1079,6 +1122,11 @@ namespace AgOpenGPS
             btnSection1Man.Text = "1";
 
             worldGrid.BingBitmap = Properties.Resources.z_bingMap;
+
+            // Reset AgShare upload state and clear snapshot after field is closed
+            isAgShareUploadStarted = false;
+            snapshot = null;
+
         }
 
         public void FieldMenuButtonEnableDisable(bool isOn)
@@ -1087,6 +1135,7 @@ namespace AgOpenGPS
             deleteContourPathsToolStripMenuItem.Enabled = isOn;
             boundaryToolToolStripMenu.Enabled = isOn;
             offsetFixToolStrip.Enabled = isOn;
+            toolStripBtnFieldTools.Enabled = isOn;
 
             boundariesToolStripMenuItem.Enabled = isOn;
             headlandToolStripMenuItem.Enabled = isOn;

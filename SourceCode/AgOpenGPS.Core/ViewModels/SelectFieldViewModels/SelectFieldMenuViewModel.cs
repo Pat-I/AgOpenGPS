@@ -88,7 +88,7 @@ namespace AgOpenGPS.Core.ViewModels
             }
         }
 
-        public ICommand StartSelectNearFieldCommand { get;}
+        public ICommand StartSelectNearFieldCommand { get; }
         public ICommand StartCreateFieldFromExistingCommand { get; }
         public ICommand StartSelectFieldCommand { get; }
         public ICommand CancelCommand { get; }

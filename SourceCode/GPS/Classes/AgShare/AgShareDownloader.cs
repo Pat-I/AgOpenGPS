@@ -8,6 +8,7 @@ using System.Diagnostics;
 using AgOpenGPS.Properties;
 using AgOpenGPS.Core.Models;
 using AgOpenGPS.Classes.AgShare.Helpers;
+using AgLibrary.Logging;
 
 namespace AgOpenGPS
 {
@@ -38,6 +39,8 @@ namespace AgOpenGPS
             }
             catch (Exception ex)
             {
+                Log.EventWriter($"[AgShare] Download failed for fieldId={fieldId}: {ex.GetType().Name} - {ex.Message}");
+                Log.EventWriter(ex.StackTrace);
                 return false;
             }
         }
@@ -237,7 +240,7 @@ namespace AgOpenGPS
             File.WriteAllLines(Path.Combine(fieldDir, "Flags.txt"), new[] { "$Flags", "0" });
             File.WriteAllLines(Path.Combine(fieldDir, "Headland.txt"), new[] { "$Headland", "0" });
             File.WriteAllLines(Path.Combine(fieldDir, "Contour.txt"), new[] { "$Contour", "0" });
-            File.WriteAllLines(Path.Combine(fieldDir, "Sections.txt"), new[] { "Sections", "0" });  
+            File.WriteAllLines(Path.Combine(fieldDir, "Sections.txt"), new[] { "Sections", "0" });
         }
     }
 

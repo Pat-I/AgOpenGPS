@@ -58,7 +58,7 @@ namespace AgOpenGPS
         {
             if (!mf.mc.isOutOfBounds)
             {
-                GL.Color4(0,0,0,0.8);
+                GL.Color4(0, 0, 0, 0.8);
                 GL.LineWidth(6);
 
                 for (int i = 0; i < bndList.Count; i++)

@@ -144,8 +144,8 @@ namespace AgOpenGPS
             labelDualPositionOnRight.Text = gStr.gsDualpositionAntennaRight;
             //toolconfig
             labelToolOffset.Text = gStr.gsToolOffset;
-            labelOverlapGap.Text = gStr.gsOverlapGap;   
-            labelToolLeft.Text = gStr.gsToolLeft;   
+            labelOverlapGap.Text = gStr.gsOverlapGap;
+            labelToolLeft.Text = gStr.gsToolLeft;
             labelToolRight.Text = gStr.gsToolRight;
             labelOverlap2.Text = gStr.gsOverlap;
             labelGap.Text = gStr.gsGap;
@@ -395,6 +395,7 @@ namespace AgOpenGPS
             chkDirectionMarkers.Checked = Properties.Settings.Default.setTool_isDirectionMarkers;
             chkSectionLines.Checked = Properties.Settings.Default.setDisplay_isSectionLinesOn;
             chkLineSmooth.Checked = Properties.Settings.Default.setDisplay_isLineSmooth;
+            chkboxHeadlandDist.Checked = Properties.Settings.Default.isHeadlandDistanceOn;
 
             if (mf.isMetric) rbtnDisplayMetric.Checked = true;
             else rbtnDisplayImperial.Checked = true;

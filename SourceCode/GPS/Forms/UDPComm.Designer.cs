@@ -1,6 +1,7 @@
 ﻿using AgLibrary.Logging;
 using AgOpenGPS.Core.Models;
 using AgOpenGPS.Core.Translations;
+using AgOpenGPS.Forms;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -105,7 +106,7 @@ namespace AgOpenGPS
                                     ahrs.imuRoll = temp - ahrs.rollZero;
                                 }
                                 if (temp == float.MinValue)
-                                    ahrs.imuRoll = 0;                               
+                                    ahrs.imuRoll = 0;
 
                                 //altitude in meters
                                 temp = BitConverter.ToSingle(data, 37);
@@ -172,13 +173,13 @@ namespace AgOpenGPS
                             //Heading
                             ahrs.imuHeading = (Int16)((data[6] << 8) + data[5]);
                             ahrs.imuHeading *= 0.1;
-                            
+
                             //Roll
                             double rollK = (Int16)((data[8] << 8) + data[7]);
 
                             if (ahrs.isRollInvert) rollK *= -0.1;
                             else rollK *= 0.1;
-                            rollK -= ahrs.rollZero;                           
+                            rollK -= ahrs.rollZero;
                             ahrs.imuRoll = ahrs.imuRoll * ahrs.rollFilter + rollK * (1 - ahrs.rollFilter);
 
                             //Angular velocity
@@ -256,7 +257,7 @@ namespace AgOpenGPS
                         }
 
                     case 221: // DD
-                        {                    
+                        {
                             //{ 0x80, 0x81, 0x7f, 221, number bytes, seconds to display, mystery byte, 98,99,100,101, CRC };
                             if (data.Length < 9) break;
 
@@ -291,10 +292,10 @@ namespace AgOpenGPS
                             }
                             if (((data[5] & 2) == 2)) //mask bit #1 set and command bit #0 cycle line to the 0 = left 1 = right
                             {
-                                if ((data[6] & 1) != 1) {  btnCycleLines.PerformClick(); }
+                                if ((data[6] & 1) != 1) { btnCycleLines.PerformClick(); }
                                 if ((data[6] & 1) == 1) { btnCycleLinesBk.PerformClick(); }
                             }
-                           
+
                             break;
                         }
 
@@ -312,7 +313,7 @@ namespace AgOpenGPS
 
                             break;
                         }
-                     #endregion
+                        #endregion
                 }
             }
         }
@@ -332,7 +333,10 @@ namespace AgOpenGPS
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Load Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FormDialog.Show(
+                    "UDP Server",
+                    "Load Error: " + ex.Message,
+                    MessageBoxButtons.OK);
                 Log.EventWriter("Catch -> Load UDP Loopback Error: " + ex.ToString());
             }
         }
@@ -487,7 +491,7 @@ namespace AgOpenGPS
 
             if ((char)keyData == hotkeys[2])
             {
-                FileSaveEverythingBeforeClosingField();
+                _ = FileSaveEverythingBeforeClosingField();
                 return true;    // indicate that you handled this keystroke
             }
 
@@ -664,8 +668,7 @@ namespace AgOpenGPS
             if (keyData == Keys.Up)
             {
                 if (sim.stepDistance < 0.4 && sim.stepDistance > -0.36) sim.stepDistance += 0.01;
-                else 
-                    sim.stepDistance += 0.04;
+                else sim.stepDistance += 0.04;
                 if (sim.stepDistance > 4) sim.stepDistance = 4;
                 return true;
             }

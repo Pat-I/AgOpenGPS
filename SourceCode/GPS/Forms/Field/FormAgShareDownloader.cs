@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using AgOpenGPS.Classes.AgShare.Helpers;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace AgOpenGPS.Forms.Field
 {
@@ -12,7 +13,7 @@ namespace AgOpenGPS.Forms.Field
     /// Form that allows the user to preview and download their own AgShare fields,
     /// with OpenGL rendering of boundaries and AB lines.
     /// </summary>
-    public partial class FormAgShareDownloader : Form
+    public partial class FormAgShareDownloader : System.Windows.Forms.Form
     {
         private readonly FormGPS gps;
         private readonly CAgShareDownloader downloader;
@@ -68,7 +69,7 @@ namespace AgOpenGPS.Forms.Field
         {
             if (lbFields.SelectedItems.Count == 0) return;
 
-            var dto = lbFields.SelectedItems[0].Tag as AgShareGetOwnFieldDto;   
+            var dto = lbFields.SelectedItems[0].Tag as AgShareGetOwnFieldDto;
             if (dto == null) return;
 
             lblSelectedField.Text = "Selected Field: " + dto.Name;
@@ -106,22 +107,23 @@ namespace AgOpenGPS.Forms.Field
                 gps.TimedMessageBox(2000, "AgShare", "Field downloaded and saved.");
 
                 // Build full path to Field.txt
-                string fieldDir = System.IO.Path.Combine(RegistrySettings.fieldsDirectory, selected.Name);
-                string fieldFile = System.IO.Path.Combine(fieldDir, "Field.txt");
+                string fieldDir = Path.Combine(RegistrySettings.fieldsDirectory, selected.Name);
+                string fieldFile = Path.Combine(fieldDir, "Field.txt");
 
-                if (System.IO.File.Exists(fieldFile))
+                if (!File.Exists(fieldFile))
                 {
-                    gps.FileOpenField(fieldFile);
-                    Close(); // Close the downloader form after opening the field
-                }
-                else
-                {   
                     gps.TimedMessageBox(2000, "AgShare", "Field saved but could not be opened (missing Field.txt).");
+                    return;
                 }
-            }
-            else
-            {
-                gps.TimedMessageBox(2000, "AgShare", "Field download failed.");
+
+                // Close Current Field if necessary
+                if (gps.isJobStarted)
+                {
+                    await gps.FileSaveEverythingBeforeClosingField();
+                }
+
+                gps.FileOpenField(fieldFile);
+                Close();
             }
         }
 

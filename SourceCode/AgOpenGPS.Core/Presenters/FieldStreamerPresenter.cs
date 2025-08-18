@@ -1,4 +1,4 @@
-﻿﻿using AgOpenGPS.Core.Interfaces;
+﻿using AgOpenGPS.Core.Interfaces;
 using AgOpenGPS.Core.Translations;
 using System;
 

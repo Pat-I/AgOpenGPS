@@ -8,7 +8,7 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
-        
+
         int countExit = 4;
         int countShutdown = 5;
 
